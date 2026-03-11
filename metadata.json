@@ -1,0 +1,5 @@
+{
+  "name": "Hormuz Crisis Signal Monitor",
+  "description": "A dashboard monitoring petrochemical market impacts from the Hormuz Crisis, featuring interactive charts and an AI chatbot.",
+  "requestFramePermissions": []
+}
