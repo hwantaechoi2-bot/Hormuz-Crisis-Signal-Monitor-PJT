@@ -65,6 +65,13 @@ export function Dashboard() {
   const [timeRange, setTimeRange] = useState('1y');
   const [isFMExpanded, setIsFMExpanded] = useState(false);
   const [isTAExpanded, setIsTAExpanded] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [activeNote, setActiveNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     fetchDashboardData().then(res => {
@@ -72,9 +79,9 @@ export function Dashboard() {
       const oilGrouped: any = {};
       res.oilData.forEach(row => {
         if (!oilGrouped[row.date]) oilGrouped[row.date] = { date: row.date };
-        if (row.name.includes('WTI')) oilGrouped[row.date].WTI = row.price;
-        if (row.name.includes('브렌트')) oilGrouped[row.date].Brent = row.price;
-        if (row.name.includes('두바이')) oilGrouped[row.date].Dubai = row.price;
+        if (row.name.includes('WTI') || row.name.includes('CLJ6')) oilGrouped[row.date].WTI = row.price;
+        if (row.name.includes('브렌트') || row.name.includes('COK6')) oilGrouped[row.date].Brent = row.price;
+        if (row.name.includes('두바이') || row.name.includes('DBL1')) oilGrouped[row.date].Dubai = row.price;
       });
       const processedOil = Object.values(oilGrouped).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -125,6 +132,26 @@ export function Dashboard() {
     };
   }, [data, timeRange]);
 
+  const freightChartData = useMemo(() => {
+    if (!filteredData || !filteredData.freight) return [];
+    
+    const months = ['3월물', '4월물', '5월물', '6월물'];
+    return months.map(month => {
+      const row: any = { month };
+      filteredData.freight.forEach((d: any) => {
+        if (d[month] !== undefined) {
+          row[d.date] = d[month];
+        }
+      });
+      return row;
+    });
+  }, [filteredData]);
+  
+  const freightDates = useMemo(() => {
+    if (!filteredData || !filteredData.freight) return [];
+    return filteredData.freight.map((d: any) => d.date);
+  }, [filteredData]);
+
   if (loading || !filteredData) {
     return (
       <div className="flex items-center justify-center h-full min-h-[500px]">
@@ -165,25 +192,24 @@ export function Dashboard() {
   return (
     <div className="pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-[#0B0B0F]/95 backdrop-blur-sm border-b border-[#2A2A35] mb-6">
-        <div className="max-w-[1600px] mx-auto px-6 lg:px-8 py-4 md:py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="sticky top-0 z-50 bg-[#0B0B0F]/95 backdrop-blur-sm border-b border-[#2A2A35] mb-4 sm:mb-6">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 md:py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Activity className="text-purple-500" />
+            <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+              <Activity className="text-purple-500 w-5 h-5 sm:w-6 sm:h-6" />
               Hormuz Crisis Signal Monitor
             </h1>
-            <p className="text-gray-400 text-sm mt-1">Real-time tracking of petrochemical market impacts</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-sm font-medium text-gray-400 hidden sm:block">
-              {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full md:w-auto">
+            <div className="text-xs sm:text-sm font-medium text-gray-400">
+              {currentTime.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })} {currentTime.toLocaleTimeString('ko-KR', { hour12: false })}
             </div>
-            <div className="flex items-center gap-2 bg-[#1C1C24] p-1.5 rounded-xl border border-[#2A2A35]">
+            <div className="flex items-center gap-1 sm:gap-2 bg-[#1C1C24] p-1 sm:p-1.5 rounded-xl border border-[#2A2A35] w-full sm:w-auto overflow-x-auto hide-scrollbar">
               {['7d', '30d', '6m', '1y'].map((range) => (
                 <button
                   key={range}
                   onClick={() => setTimeRange(range)}
-                  className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
                     timeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
                   }`}
                 >
@@ -195,7 +221,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-8 space-y-6">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-6">
         {/* Top Indicators */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Oil Futures */}
@@ -208,43 +234,43 @@ export function Dashboard() {
               <p className="text-sm text-gray-400 font-medium">원유 / CRUDE OIL <span className="text-gray-500 text-xs ml-1">[단위: $/bbl]</span></p>
             </div>
             
-            <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
               <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">WTI(1개월물)</p>
-                <div className="flex flex-col gap-1">
+                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">WTI</p>
+                <div className="flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start gap-1">
                   <div className="flex items-baseline gap-2">
                     <span className="text-lg lg:text-xl font-bold text-white">${latestWTI.WTI?.toFixed(2) || '-'}</span>
                     <span className={`text-sm font-medium ${wtiChange.color}`}>({wtiChange.diffText})</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-xs text-gray-400">전일: ${prevWTI.WTI?.toFixed(2) || '-'}</span>
-                    <span className={`text-[10px] font-medium ${wtiChange.color}`}>({wtiChange.pctText})</span>
+                    <span className="text-xs text-gray-400 sm:block hidden">전일: ${prevWTI.WTI?.toFixed(2) || '-'}</span>
+                    <span className={`text-[10px] font-medium ${wtiChange.color} sm:block hidden`}>({wtiChange.pctText})</span>
                   </div>
                 </div>
               </div>
               <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">BRENT(1개월물)</p>
-                <div className="flex flex-col gap-1">
+                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">BRENT</p>
+                <div className="flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start gap-1">
                   <div className="flex items-baseline gap-2">
                     <span className="text-lg lg:text-xl font-bold text-white">${latestBrent.Brent?.toFixed(2) || '-'}</span>
                     <span className={`text-sm font-medium ${brentChange.color}`}>({brentChange.diffText})</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-xs text-gray-400">전일: ${prevBrent.Brent?.toFixed(2) || '-'}</span>
-                    <span className={`text-[10px] font-medium ${brentChange.color}`}>({brentChange.pctText})</span>
+                    <span className="text-xs text-gray-400 sm:block hidden">전일: ${prevBrent.Brent?.toFixed(2) || '-'}</span>
+                    <span className={`text-[10px] font-medium ${brentChange.color} sm:block hidden`}>({brentChange.pctText})</span>
                   </div>
                 </div>
               </div>
               <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">DUBAI(1개월물)</p>
-                <div className="flex flex-col gap-1">
+                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">DUBAI</p>
+                <div className="flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start gap-1">
                   <div className="flex items-baseline gap-2">
                     <span className="text-lg lg:text-xl font-bold text-white">${latestDubai.Dubai?.toFixed(2) || '-'}</span>
                     <span className={`text-sm font-medium ${dubaiChange.color}`}>({dubaiChange.diffText})</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-xs text-gray-400">전일: ${prevDubai.Dubai?.toFixed(2) || '-'}</span>
-                    <span className={`text-[10px] font-medium ${dubaiChange.color}`}>({dubaiChange.pctText})</span>
+                    <span className="text-xs text-gray-400 sm:block hidden">전일: ${prevDubai.Dubai?.toFixed(2) || '-'}</span>
+                    <span className={`text-[10px] font-medium ${dubaiChange.color} sm:block hidden`}>({dubaiChange.pctText})</span>
                   </div>
                 </div>
               </div>
@@ -356,13 +382,16 @@ export function Dashboard() {
         <Card className="lg:col-span-3">
           <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Ship className="text-blue-400" size={20} />
-                운임선물 추이 (Freight Futures)
+              <CardTitle className="text-lg flex items-start gap-2">
+                <Ship className="text-blue-400 mt-1" size={20} />
+                <div className="flex flex-col">
+                  <span>운임선물 추이</span>
+                  <span className="text-sm text-gray-400 font-normal">(Freight Futures)</span>
+                </div>
               </CardTitle>
               <CardDescription>3, 4, 5, 6월물 추이</CardDescription>
             </div>
-            <div className="flex flex-wrap items-center gap-2 lg:gap-4">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 lg:gap-4 w-full sm:w-auto">
               {[
                 { label: '3월물', latest: latestFreight['3월물'], prev: prevFreight['3월물'] },
                 { label: '4월물', latest: latestFreight['4월물'], prev: prevFreight['4월물'] },
@@ -371,16 +400,15 @@ export function Dashboard() {
               ].map((item) => {
                 const change = calculateChange(item.latest, item.prev);
                 return (
-                  <div key={item.label} className="flex flex-col items-center bg-[#1C1C24] px-4 py-2 rounded-xl border border-[#2A2A35] min-w-[130px]">
-                    <span className="text-gray-500 text-xs font-medium tracking-wider mb-1">{item.label}</span>
-                    <div className="flex flex-col gap-1 items-center">
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-lg font-bold text-white">${item.latest?.toFixed(2) || '-'}</span>
-                        <span className={`text-xs font-medium ${change.color}`}>({change.diffText})</span>
+                  <div key={item.label} className="flex flex-col items-center bg-[#1C1C24] px-3 sm:px-4 py-2 rounded-xl border border-[#2A2A35] min-w-0 sm:min-w-[130px] w-full">
+                    <span className="text-gray-500 text-[10px] sm:text-xs font-medium tracking-wider mb-1">{item.label}</span>
+                    <div className="flex flex-col gap-0.5 sm:gap-1 items-center">
+                      <div className="flex items-baseline gap-1 sm:gap-1.5">
+                        <span className="text-base sm:text-lg font-bold text-white">${item.latest?.toFixed(2) || '-'}</span>
+                        <span className={`text-[10px] sm:text-xs font-medium ${change.color}`}>({change.diffText})</span>
                       </div>
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-sm text-gray-400">전일: ${item.prev?.toFixed(2) || '-'}</span>
-                        <span className={`text-xs font-medium ${change.color}`}>({change.pctText})</span>
+                      <div className="flex items-baseline gap-1 sm:gap-1.5">
+                        <span className="text-xs sm:text-sm text-gray-400">전일: ${item.prev?.toFixed(2) || '-'}</span>
                       </div>
                     </div>
                   </div>
@@ -391,16 +419,30 @@ export function Dashboard() {
           <CardContent>
             <div className="h-[300px] w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={filteredData.freight} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <LineChart data={freightChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
-                  <XAxis dataKey="date" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
+                  <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                  <Line type="monotone" dataKey="3월물" stroke="#3b82f6" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="4월물" stroke="#10b981" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="5월물" stroke="#f59e0b" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="6월물" stroke="#8b5cf6" strokeWidth={2} dot={false} />
+                  {freightDates.map((date, idx) => {
+                    const isLatest = idx === freightDates.length - 1;
+                    const isPrev = idx === freightDates.length - 2;
+                    const opacity = Math.max(0.1, (idx + 1) / freightDates.length);
+                    const color = isLatest ? '#3b82f6' : isPrev ? '#10b981' : `rgba(107, 114, 128, ${opacity})`;
+                    return (
+                      <Line 
+                        key={date} 
+                        type="monotone" 
+                        dataKey={date} 
+                        stroke={color} 
+                        strokeWidth={isLatest || isPrev ? 2 : 1} 
+                        dot={isLatest || isPrev} 
+                        activeDot={{ r: 4 }}
+                        name={date}
+                      />
+                    );
+                  })}
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -439,9 +481,23 @@ export function Dashboard() {
                         <div className="flex items-center gap-1.5">
                           {item.company}
                           {item.note && item.note !== '-' && (
-                            <span title={item.note} className="flex items-center">
-                              <Info size={14} className="text-yellow-500 cursor-help" />
-                            </span>
+                            <div className="relative">
+                              <button
+                                onMouseDown={() => setActiveNote(`fm-${idx}`)}
+                                onMouseUp={() => setActiveNote(null)}
+                                onMouseLeave={() => setActiveNote(null)}
+                                onTouchStart={() => setActiveNote(`fm-${idx}`)}
+                                onTouchEnd={() => setActiveNote(null)}
+                                className="flex items-center focus:outline-none"
+                              >
+                                <Info size={14} className="text-yellow-500" />
+                              </button>
+                              {activeNote === `fm-${idx}` && (
+                                <div className="absolute z-[100] bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#2A2A35] text-xs text-white rounded-lg shadow-xl border border-gray-600 pointer-events-none">
+                                  {item.note}
+                                </div>
+                              )}
+                            </div>
                           )}
                         </div>
                       </td>
@@ -498,9 +554,23 @@ export function Dashboard() {
                         <div className="flex items-center gap-1.5">
                           {item.company}
                           {item.note && item.note !== '-' && (
-                            <span title={item.note} className="flex items-center">
-                              <Info size={14} className="text-yellow-500 cursor-help" />
-                            </span>
+                            <div className="relative">
+                              <button
+                                onMouseDown={() => setActiveNote(`or-${idx}`)}
+                                onMouseUp={() => setActiveNote(null)}
+                                onMouseLeave={() => setActiveNote(null)}
+                                onTouchStart={() => setActiveNote(`or-${idx}`)}
+                                onTouchEnd={() => setActiveNote(null)}
+                                className="flex items-center focus:outline-none"
+                              >
+                                <Info size={14} className="text-yellow-500" />
+                              </button>
+                              {activeNote === `or-${idx}` && (
+                                <div className="absolute z-[100] bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#2A2A35] text-xs text-white rounded-lg shadow-xl border border-gray-600 pointer-events-none">
+                                  {item.note}
+                                </div>
+                              )}
+                            </div>
                           )}
                         </div>
                       </td>
@@ -516,96 +586,7 @@ export function Dashboard() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Turnaround Status */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">T/A 현황 (Cracker 기준)</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          {/* Section A */}
-          <div>
-            <h3 className="text-md font-semibold text-white mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-              A) Planned T/A 진행 中 → 가동 지연 가능성
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="text-xs text-gray-400 uppercase bg-[#1C1C24] border-b border-[#2A2A35]">
-                  <tr>
-                    <th className="px-4 py-3 rounded-tl-lg">Company</th>
-                    <th className="px-4 py-3">Country</th>
-                    <th className="px-4 py-3">Commodity</th>
-                    <th className="px-4 py-3">Capa</th>
-                    <th className="px-4 py-3 rounded-tr-lg">Period</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(isTAExpanded ? taOngoing : taOngoing.slice(0, 3)).map((item: any, idx: number) => (
-                    <tr key={idx} className="border-b border-[#2A2A35]/50 hover:bg-[#1C1C24]/50 transition-colors">
-                      <td className="px-4 py-3 font-medium text-white">{item.company}</td>
-                      <td className="px-4 py-3 text-gray-300">{item.country}</td>
-                      <td className="px-4 py-3 text-gray-300">{item.commodity}</td>
-                      <td className="px-4 py-3 text-gray-300">{item.capacity}</td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">{item.start} ~ {item.end}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Section B */}
-          <div>
-            <h3 className="text-md font-semibold text-white mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-              B) Planned(~'26.2Q) → 조기 실시 가능성
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="text-xs text-gray-400 uppercase bg-[#1C1C24] border-b border-[#2A2A35]">
-                  <tr>
-                    <th className="px-4 py-3 rounded-tl-lg">Company</th>
-                    <th className="px-4 py-3">Country</th>
-                    <th className="px-4 py-3">Commodity</th>
-                    <th className="px-4 py-3">Capa</th>
-                    <th className="px-4 py-3 rounded-tr-lg">Period</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(isTAExpanded ? taPlanned : taPlanned.slice(0, 3)).map((item: any, idx: number) => (
-                    <tr key={idx} className="border-b border-[#2A2A35]/50 hover:bg-[#1C1C24]/50 transition-colors">
-                      <td className="px-4 py-3 font-medium text-white">{item.company}</td>
-                      <td className="px-4 py-3 text-gray-300">{item.country}</td>
-                      <td className="px-4 py-3 text-gray-300">{item.commodity}</td>
-                      <td className="px-4 py-3 text-gray-300">{item.capacity}</td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">{item.start} ~ {item.end}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {(taOngoing.length > 3 || taPlanned.length > 3) && (
-            <div className="mt-4 flex justify-center">
-              <button
-                onClick={() => setIsTAExpanded(!isTAExpanded)}
-                className="flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors bg-[#1C1C24] px-4 py-2 rounded-lg border border-[#2A2A35]"
-              >
-                {isTAExpanded ? (
-                  <><ChevronUp size={16} /> 접기</>
-                ) : (
-                  <><ChevronDown size={16} /> 더보기</>
-                )}
-              </button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      </div>
+    </div>
     </div>
   );
 }
