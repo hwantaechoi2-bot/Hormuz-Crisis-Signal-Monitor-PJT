@@ -4,6 +4,11 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { fetchDashboardData } from '../data/fetchData';
 import { TrendingUp, TrendingDown, AlertTriangle, Activity, Ship, Droplet, Factory, Settings, ChevronUp, ChevronDown, Info, Menu, X } from 'lucide-react';
 
+const formatNumber = (num: number | undefined, decimals: number = 2) => {
+  if (num === undefined || num === null) return '-';
+  return num.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+};
+
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const sortedPayload = [...payload].sort((a, b) => {
@@ -20,7 +25,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <p className="text-gray-400 text-xs mb-1">{label}</p>
         {sortedPayload.map((entry: any, index: number) => (
           <p key={index} className="text-sm font-semibold" style={{ color: entry.color }}>
-            {entry.name}: {entry.value?.toFixed ? entry.value.toFixed(2) : entry.value}
+            {entry.name}: {formatNumber(entry.value, 2)}
           </p>
         ))}
       </div>
@@ -40,12 +45,12 @@ const calculateChange = (current: number, previous: number) => {
 
   if (diff > 0) {
     color = 'text-emerald-400';
-    diffText = `+${diff.toFixed(2)}`;
-    pctText = `+${pct.toFixed(2)}%`;
+    diffText = `+${formatNumber(diff, 2)}`;
+    pctText = `+${formatNumber(pct, 2)}%`;
   } else if (diff < 0) {
     color = 'text-rose-400';
-    diffText = `${diff.toFixed(2)}`;
-    pctText = `${pct.toFixed(2)}%`;
+    diffText = `${formatNumber(diff, 2)}`;
+    pctText = `${formatNumber(pct, 2)}%`;
   }
 
   return { diffText, pctText, color, diff };
@@ -375,40 +380,40 @@ export function Dashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
               <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
                 <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">WTI</p>
-                <div className="flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start gap-1">
+                <div className="flex flex-col gap-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-lg lg:text-xl font-bold text-white">${latestWTI.WTI?.toFixed(2) || '-'}</span>
+                    <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestWTI.WTI, 2)}</span>
                     <span className={`text-sm font-medium ${wtiChange.color}`}>({wtiChange.diffText})</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-xs text-gray-400 sm:block hidden">전일: ${prevWTI.WTI?.toFixed(2) || '-'}</span>
-                    <span className={`text-[10px] font-medium ${wtiChange.color} sm:block hidden`}>({wtiChange.pctText})</span>
+                    <span className="text-xs text-gray-400">전일: ${formatNumber(prevWTI.WTI, 2)}</span>
+                    <span className={`text-[10px] font-medium ${wtiChange.color}`}>({wtiChange.pctText})</span>
                   </div>
                 </div>
               </div>
               <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
                 <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">BRENT</p>
-                <div className="flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start gap-1">
+                <div className="flex flex-col gap-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-lg lg:text-xl font-bold text-white">${latestBrent.Brent?.toFixed(2) || '-'}</span>
+                    <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestBrent.Brent, 2)}</span>
                     <span className={`text-sm font-medium ${brentChange.color}`}>({brentChange.diffText})</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-xs text-gray-400 sm:block hidden">전일: ${prevBrent.Brent?.toFixed(2) || '-'}</span>
-                    <span className={`text-[10px] font-medium ${brentChange.color} sm:block hidden`}>({brentChange.pctText})</span>
+                    <span className="text-xs text-gray-400">전일: ${formatNumber(prevBrent.Brent, 2)}</span>
+                    <span className={`text-[10px] font-medium ${brentChange.color}`}>({brentChange.pctText})</span>
                   </div>
                 </div>
               </div>
               <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
                 <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">DUBAI</p>
-                <div className="flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start gap-1">
+                <div className="flex flex-col gap-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-lg lg:text-xl font-bold text-white">${latestDubai.Dubai?.toFixed(2) || '-'}</span>
+                    <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestDubai.Dubai, 2)}</span>
                     <span className={`text-sm font-medium ${dubaiChange.color}`}>({dubaiChange.diffText})</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-xs text-gray-400 sm:block hidden">전일: ${prevDubai.Dubai?.toFixed(2) || '-'}</span>
-                    <span className={`text-[10px] font-medium ${dubaiChange.color} sm:block hidden`}>({dubaiChange.pctText})</span>
+                    <span className="text-xs text-gray-400">전일: ${formatNumber(prevDubai.Dubai, 2)}</span>
+                    <span className={`text-[10px] font-medium ${dubaiChange.color}`}>({dubaiChange.pctText})</span>
                   </div>
                 </div>
               </div>
@@ -458,41 +463,41 @@ export function Dashboard() {
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
               <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">미국</p>
-                <div className="flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start gap-1">
+                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">미국(Henry Hub)</p>
+                <div className="flex flex-col gap-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-lg lg:text-xl font-bold text-white">${latestUS.US?.toFixed(2) || '-'}</span>
+                    <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestUS.US, 2)}</span>
                     <span className={`text-sm font-medium ${usChange.color}`}>({usChange.diffText})</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-xs text-gray-400 sm:block hidden">전일: ${prevUS.US?.toFixed(2) || '-'}</span>
-                    <span className={`text-[10px] font-medium ${usChange.color} sm:block hidden`}>({usChange.pctText})</span>
+                    <span className="text-xs text-gray-400">전일: ${formatNumber(prevUS.US, 2)}</span>
+                    <span className={`text-[10px] font-medium ${usChange.color}`}>({usChange.pctText})</span>
                   </div>
                 </div>
               </div>
               <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">아시아</p>
-                <div className="flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start gap-1">
+                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">아시아(JKM)</p>
+                <div className="flex flex-col gap-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-lg lg:text-xl font-bold text-white">${latestAsia.Asia?.toFixed(2) || '-'}</span>
+                    <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestAsia.Asia, 2)}</span>
                     <span className={`text-sm font-medium ${asiaChange.color}`}>({asiaChange.diffText})</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-xs text-gray-400 sm:block hidden">전일: ${prevAsia.Asia?.toFixed(2) || '-'}</span>
-                    <span className={`text-[10px] font-medium ${asiaChange.color} sm:block hidden`}>({asiaChange.pctText})</span>
+                    <span className="text-xs text-gray-400">전일: ${formatNumber(prevAsia.Asia, 2)}</span>
+                    <span className={`text-[10px] font-medium ${asiaChange.color}`}>({asiaChange.pctText})</span>
                   </div>
                 </div>
               </div>
               <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">유럽</p>
-                <div className="flex flex-row sm:flex-col justify-between sm:justify-start items-center sm:items-start gap-1">
+                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">유럽(TTF)</p>
+                <div className="flex flex-col gap-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-lg lg:text-xl font-bold text-white">${latestEurope.Europe?.toFixed(2) || '-'}</span>
+                    <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestEurope.Europe, 2)}</span>
                     <span className={`text-sm font-medium ${europeChange.color}`}>({europeChange.diffText})</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-xs text-gray-400 sm:block hidden">전일: ${prevEurope.Europe?.toFixed(2) || '-'}</span>
-                    <span className={`text-[10px] font-medium ${europeChange.color} sm:block hidden`}>({europeChange.pctText})</span>
+                    <span className="text-xs text-gray-400">전일: ${formatNumber(prevEurope.Europe, 2)}</span>
+                    <span className={`text-[10px] font-medium ${europeChange.color}`}>({europeChange.pctText})</span>
                   </div>
                 </div>
               </div>
@@ -543,12 +548,12 @@ export function Dashboard() {
             <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4">
               <div className="flex flex-col gap-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl lg:text-3xl font-bold text-white">${latestNaphtha.Naphtha?.toFixed(2) || '-'}</span>
+                  <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestNaphtha.Naphtha, 2)}</span>
                   <span className={`text-sm font-medium ${naphthaChange.color}`}>({naphthaChange.diffText})</span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-sm text-gray-400">전일: ${prevNaphtha.Naphtha?.toFixed(2) || '-'}</span>
-                  <span className={`text-xs font-medium ${naphthaChange.color}`}>({naphthaChange.pctText})</span>
+                  <span className="text-xs text-gray-400">전일: ${formatNumber(prevNaphtha.Naphtha, 2)}</span>
+                  <span className={`text-[10px] font-medium ${naphthaChange.color}`}>({naphthaChange.pctText})</span>
                 </div>
               </div>
             </div>
@@ -595,18 +600,18 @@ export function Dashboard() {
             <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start">
               <div className="flex flex-col gap-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl lg:text-3xl font-bold text-white">${latestEthylene.Ethylene?.toFixed(2) || '-'}</span>
+                  <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestEthylene.Ethylene, 2)}</span>
                   <span className={`text-sm font-medium ${ethyleneChange.color}`}>({ethyleneChange.diffText})</span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-sm text-gray-400">전일: ${prevEthylene.Ethylene?.toFixed(2) || '-'}</span>
-                  <span className={`text-xs font-medium ${ethyleneChange.color}`}>({ethyleneChange.pctText})</span>
+                  <span className="text-xs text-gray-400">전일: ${formatNumber(prevEthylene.Ethylene, 2)}</span>
+                  <span className={`text-[10px] font-medium ${ethyleneChange.color}`}>({ethyleneChange.pctText})</span>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-xs text-gray-500 font-medium mb-1">에틸렌 Spread</p>
-                <p className={`text-xl lg:text-2xl font-bold ${latestSpread.Spread !== undefined && latestSpread.Spread < 300 ? 'text-rose-500' : 'text-emerald-500'}`}>
-                  ${latestSpread.Spread?.toFixed(2) || '-'}
+                <p className="text-[10px] text-gray-500 font-medium mb-1">에틸렌 Spread</p>
+                <p className={`text-lg lg:text-xl font-bold ${latestSpread.Spread !== undefined && latestSpread.Spread < 300 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                  ${formatNumber(latestSpread.Spread, 2)}
                 </p>
               </div>
             </div>
@@ -656,34 +661,38 @@ export function Dashboard() {
                 </div>
               </CardTitle>
             </div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full md:w-auto">
-              <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 lg:gap-4 w-full sm:w-auto">
-                {[
-                  { label: 'BDI (고체)', latest: latestBDI.BDI, prev: prevBDI.BDI, unit: '$', decimals: 2 },
-                  { label: 'Clean (정제유/납사)', latest: latestClean.Clean, prev: prevClean.Clean, unit: '$', decimals: 2 },
-                  { label: 'Dirty (원유)', latest: latestDirty.Dirty, prev: prevDirty.Dirty, unit: '$', decimals: 2 },
-                  { label: 'SCFI (Container)', latest: latestSCFI.SCFI, prev: prevSCFI.SCFI, unit: '$', decimals: 2 },
-                ].map((item) => {
-                  const change = calculateChange(item.latest, item.prev);
-                  return (
-                    <div key={item.label} className="flex flex-col items-center bg-[#1C1C24] px-3 sm:px-4 py-2 rounded-xl border border-[#2A2A35] min-w-0 sm:min-w-[130px] w-full">
-                      <span className="text-gray-500 text-[10px] sm:text-xs font-medium tracking-wider mb-1 text-center">{item.label}</span>
-                      <div className="flex flex-col gap-0.5 sm:gap-1 items-center">
-                        <div className="flex items-baseline gap-1 sm:gap-1.5">
-                          <span className="text-base sm:text-lg font-bold text-white">{item.unit}{item.latest?.toFixed(item.decimals) || '-'}</span>
-                          <span className={`text-[10px] sm:text-xs font-medium ${change.color}`}>({change.diffText})</span>
-                        </div>
-                        <div className="flex items-baseline gap-1 sm:gap-1.5">
-                          <span className="text-xs sm:text-sm text-gray-400">전일: {item.unit}{item.prev?.toFixed(item.decimals) || '-'}</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            <div className="text-xs text-gray-500 font-medium">
+              Clean/Dirty: MEG → JP
             </div>
           </CardHeader>
           <CardContent>
+            <div className="grid grid-cols-1 gap-2 mb-4">
+              {[
+                { label: 'BDI', latest: latestBDI.BDI, prev: prevBDI.BDI, unit: '', decimals: 2 },
+                { label: 'SCFI', latest: latestSCFI.SCFI, prev: prevSCFI.SCFI, unit: '', decimals: 2 },
+                { label: 'Dirty (원유)', latest: latestDirty.Dirty, prev: prevDirty.Dirty, unit: '$', decimals: 2 },
+                { label: 'Clean (정제유/납사)', latest: latestClean.Clean, prev: prevClean.Clean, unit: '$', decimals: 2 },
+              ].map((item) => {
+                const change = calculateChange(item.latest, item.prev);
+                return (
+                  <div key={item.label} className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
+                    <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">{item.label}</p>
+                    <div className="flex justify-between items-end">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-lg lg:text-xl font-bold text-white">{item.unit}{formatNumber(item.latest, item.decimals)}</span>
+                          <span className={`text-sm font-medium ${change.color}`}>({change.diffText})</span>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-xs text-gray-400">전일: {item.unit}{formatNumber(item.prev, item.decimals)}</span>
+                          <span className={`text-[10px] font-medium ${change.color}`}>({change.pctText})</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
             <div className="flex justify-end mb-2">
               <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
                 {['1w', '1m', '6m', '1y'].map((range) => (
@@ -741,34 +750,36 @@ export function Dashboard() {
                 </div>
               </CardTitle>
             </div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full md:w-auto">
-              <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 lg:gap-4 w-full sm:w-auto">
-                {[
-                  { label: '3월물', latest: latestFreight['3월물'], prev: prevFreight['3월물'] },
-                  { label: '4월물', latest: latestFreight['4월물'], prev: prevFreight['4월물'] },
-                  { label: '5월물', latest: latestFreight['5월물'], prev: prevFreight['5월물'] },
-                  { label: '6월물', latest: latestFreight['6월물'], prev: prevFreight['6월물'] },
-                ].map((item) => {
-                  const change = calculateChange(item.latest, item.prev);
-                  return (
-                    <div key={item.label} className="flex flex-col items-center bg-[#1C1C24] px-3 sm:px-4 py-2 rounded-xl border border-[#2A2A35] min-w-0 sm:min-w-[130px] w-full">
-                      <span className="text-gray-500 text-[10px] sm:text-xs font-medium tracking-wider mb-1">{item.label}</span>
-                      <div className="flex flex-col gap-0.5 sm:gap-1 items-center">
-                        <div className="flex items-baseline gap-1 sm:gap-1.5">
-                          <span className="text-base sm:text-lg font-bold text-white">${item.latest?.toFixed(2) || '-'}</span>
-                          <span className={`text-[10px] sm:text-xs font-medium ${change.color}`}>({change.diffText})</span>
-                        </div>
-                        <div className="flex items-baseline gap-1 sm:gap-1.5">
-                          <span className="text-xs sm:text-sm text-gray-400">전일: ${item.prev?.toFixed(2) || '-'}</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            <div className="text-xs text-gray-500 font-medium">
+              TD3 FFA MEG → JP
             </div>
           </CardHeader>
           <CardContent>
+            <div className="grid grid-cols-1 gap-2 mb-4">
+              {[
+                { label: '3월물', latest: latestFreight['3월물'], prev: prevFreight['3월물'] },
+                { label: '4월물', latest: latestFreight['4월물'], prev: prevFreight['4월물'] },
+                { label: '5월물', latest: latestFreight['5월물'], prev: prevFreight['5월물'] },
+                { label: '6월물', latest: latestFreight['6월물'], prev: prevFreight['6월물'] },
+              ].map((item) => {
+                const change = calculateChange(item.latest, item.prev);
+                return (
+                  <div key={item.label} className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
+                    <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">{item.label}</p>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(item.latest, 2)}</span>
+                        <span className={`text-sm font-medium ${change.color}`}>({change.diffText})</span>
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xs text-gray-400">전일: ${formatNumber(item.prev, 2)}</span>
+                        <span className={`text-[10px] font-medium ${change.color}`}>({change.pctText})</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
             <div className="flex justify-end mb-2">
               <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
                 {['1w', '6w', '6m'].map((range) => (
