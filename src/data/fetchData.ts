@@ -4,8 +4,11 @@ const BASE_URL = 'https://docs.google.com/spreadsheets/d/1Hl2lusHsyfZeaA5SmDOG57
 
 const GIDS = {
   OIL: '1178400251',
+  NATURAL_GAS: '858636807',
   NAPHTHA_ETHYLENE: '224484968',
   FREIGHT: '0',
+  FREIGHT_SPOT: '340864639',
+  FREIGHT_CONTAINER: '896888630',
   FORCE_MAJEURE: '454908556',
   OPERATING_RATES: '1209759407',
   TURNAROUND: '720422684'
@@ -20,15 +23,21 @@ async function fetchCsv(gid: string) {
 export async function fetchDashboardData() {
   const [
     oilDataRaw,
+    naturalGasRaw,
     naphthaEthyleneRaw,
     freightRaw,
+    freightSpotRaw,
+    freightContainerRaw,
     forceMajeureRaw,
     operatingRatesRaw,
     turnaroundRaw
   ] = await Promise.all([
     fetchCsv(GIDS.OIL),
+    fetchCsv(GIDS.NATURAL_GAS),
     fetchCsv(GIDS.NAPHTHA_ETHYLENE),
     fetchCsv(GIDS.FREIGHT),
+    fetchCsv(GIDS.FREIGHT_SPOT),
+    fetchCsv(GIDS.FREIGHT_CONTAINER),
     fetchCsv(GIDS.FORCE_MAJEURE),
     fetchCsv(GIDS.OPERATING_RATES),
     fetchCsv(GIDS.TURNAROUND)
@@ -37,6 +46,13 @@ export async function fetchDashboardData() {
   // Parse Oil Futures (Dubai, WTI, Brent)
   // Format: [empty, 일자, 이름, 가격, 코드]
   const oilData = oilDataRaw.slice(2).map(row => ({
+    date: row[1],
+    name: row[2],
+    price: parseFloat(row[3])
+  })).filter(row => row.date && !isNaN(row.price));
+
+  // Parse Natural Gas (미국, 유럽, 아시아)
+  const naturalGasData = naturalGasRaw.slice(2).map(row => ({
     date: row[1],
     name: row[2],
     price: parseFloat(row[3])
@@ -51,6 +67,20 @@ export async function fetchDashboardData() {
 
   // Parse Freight Futures
   const freightData = freightRaw.slice(2).map(row => ({
+    date: row[1],
+    name: row[2],
+    price: parseFloat(row[3])
+  })).filter(row => row.date && !isNaN(row.price));
+
+  // Parse Freight Spot
+  const freightSpotData = freightSpotRaw.slice(2).map(row => ({
+    date: row[1],
+    name: row[2],
+    price: parseFloat(row[3])
+  })).filter(row => row.date && !isNaN(row.price));
+
+  // Parse Freight Container
+  const freightContainerData = freightContainerRaw.slice(2).map(row => ({
     date: row[1],
     name: row[2],
     price: parseFloat(row[3])
@@ -99,8 +129,11 @@ export async function fetchDashboardData() {
 
   return {
     oilData,
+    naturalGasData,
     neData,
     freightData,
+    freightSpotData,
+    freightContainerData,
     forceMajeureData,
     operatingRatesData,
     turnaroundData
