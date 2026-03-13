@@ -133,53 +133,53 @@ const formatHeaderTime = (date: Date) => {
   const min = kst.getMinutes().toString().padStart(2, '0');
   const ss = kst.getSeconds().toString().padStart(2, '0');
 
-  return `${yyyy}.${mm}.${dd}(${day}) / ${hh}:${min}:${ss} (${ampm}) [KST 기준]`;
+  return `${yyyy}.${mm}.${dd}(${day}) / ${ampm} ${hh}:${min}:${ss}[KST]`;
 };
 
-const naphthaDetails: Record<string, { origin: string, port: string, note: string }[]> = {
+const naphthaDetails: Record<string, { origin: string, port: string, existing?: number, tank?: number, drone?: number, note: string }[]> = {
   'Kuwait': [
-    { origin: 'Mina Al-Ahmadi Refinery', port: 'MAA+MAB', note: '' },
-    { origin: 'Mina Abdulla Refinery', port: 'MAB', note: 'Tank 제약으로 S/D' },
-    { origin: 'Al-Zour', port: 'Mina Al Zour', note: 'Tank 제약으로 가동율 조정(△25%)' },
+    { origin: 'Mina Al-Ahmadi Refinery', port: 'MAA+MAB', existing: 266, tank: 0, drone: 0, note: '' },
+    { origin: 'Mina Abdulla Refinery', port: 'MAB', existing: 200, tank: 100, drone: 0, note: 'Tank 제약으로 S/D' },
+    { origin: 'Al-Zour', port: 'Mina Al Zour', existing: 200, tank: 66, drone: 0, note: 'Tank 제약으로 가동율 조정(△25%)' },
   ],
   'Saudi': [
-    { origin: 'Yanbu Refinery', port: 'Yanbu', note: '사우디 West' },
-    { origin: 'Rabigh Refinery', port: 'Rabigh', note: '사우디 West' },
-    { origin: 'Jubail(Shell/Aramco)', port: 'Jubail', note: '' },
-    { origin: 'Ras Tanura Refinery', port: 'Ras Tanura', note: 'Drone attack : Main 설비 이상 없음, 현재 재가동 준비중' },
-    { origin: 'Saudi/Total Jubail Refinery', port: 'Jubail', note: '' },
+    { origin: 'Yanbu Refinery', port: 'Yanbu', existing: 100, tank: 0, drone: 0, note: '사우디 West' },
+    { origin: 'Rabigh Refinery', port: 'Rabigh', existing: 100, tank: 0, drone: 0, note: '사우디 West' },
+    { origin: 'Jubail(Shell/Aramco)', port: 'Jubail', existing: 100, tank: 0, drone: 0, note: '' },
+    { origin: 'Ras Tanura Refinery', port: 'Ras Tanura', existing: 148, tank: 0, drone: 150, note: 'Drone attack : Main 설비 이상 없음, 현재 재가동 준비중' },
+    { origin: 'Saudi/Total Jubail Refinery', port: 'Jubail', existing: 100, tank: 0, drone: 0, note: '' },
   ],
   'Bahrain': [
-    { origin: 'BAPCO', port: 'B220', note: '' },
-    { origin: 'BAPCO', port: 'B210', note: 'Drone attack : Tank Area 영향 (사전 예방 조치로 CDU S/D)' },
+    { origin: 'BAPCO', port: 'B220', existing: 115, tank: 0, drone: 0, note: '' },
+    { origin: 'BAPCO', port: 'B210', existing: 100, tank: 15, drone: 100, note: 'Drone attack : Tank Area 영향 (사전 예방 조치로 CDU S/D)' },
   ],
   'Qatar': [
-    { origin: 'Mesaieed', port: 'NGL', note: 'Drone attack : 생산 중단' },
-    { origin: 'Ras LaffanⅠ', port: 'FRN', note: 'Tank 제약에 따른 FM' },
-    { origin: 'Ras LaffanⅡ', port: 'FRN', note: 'Tank 제약에 따른 FM' },
-    { origin: 'Ras LaffanⅡ', port: 'PC', note: 'Drone attack : 생산 중단' },
-    { origin: 'Ras LaffanⅡ', port: 'GTL', note: 'Drone attack : 생산 중단' },
-    { origin: 'Pearl GTL', port: 'GTL', note: 'Tank 제약에 따른 FM' },
+    { origin: 'Mesaieed', port: 'NGL', existing: 100, tank: 0, drone: 100, note: 'Drone attack : 생산 중단' },
+    { origin: 'Ras LaffanⅠ', port: 'FRN', existing: 200, tank: 200, drone: 0, note: 'Tank 제약에 따른 FM' },
+    { origin: 'Ras LaffanⅡ', port: 'FRN', existing: 200, tank: 200, drone: 0, note: 'Tank 제약에 따른 FM' },
+    { origin: 'Ras LaffanⅡ', port: 'PC', existing: 100, tank: 0, drone: 100, note: 'Drone attack : 생산 중단' },
+    { origin: 'Ras LaffanⅡ', port: 'GTL', existing: 100, tank: 0, drone: 75, note: 'Drone attack : 생산 중단' },
+    { origin: 'Pearl GTL', port: 'GTL', existing: 133, tank: 100, drone: 0, note: 'Tank 제약에 따른 FM' },
   ],
   'UAE': [
-    { origin: 'GASCO', port: 'Ruwais', note: 'Tank 제약에 따른 ADNOC Trading FM 준비 중' },
-    { origin: 'Umm Al Nar Refinery', port: 'Ruwais', note: 'Tank 제약에 따른 ADNOC Trading FM 준비 중' },
-    { origin: 'Condensate Splitter', port: 'Ruwais', note: 'Tank 제약으로 가동율 조정(△20%)' },
-    { origin: 'Ruwais New Refinery', port: 'Ruwais', note: 'Drone Attack : S/D (FCC 내 프로필렌 Tank 손실)' },
-    { origin: 'Jebel Ali Splitter', port: 'Jebel Ali', note: 'Tank 제약으로 가동율 조정(△20%)' },
+    { origin: 'GASCO', port: 'Ruwais', existing: 200, tank: 30, drone: 0, note: 'Tank 제약에 따른 ADNOC Trading FM 준비 중' },
+    { origin: 'Umm Al Nar Refinery', port: 'Ruwais', existing: 200, tank: 30, drone: 0, note: 'Tank 제약에 따른 ADNOC Trading FM 준비 중' },
+    { origin: 'Condensate Splitter', port: 'Ruwais', existing: 200, tank: 34, drone: 0, note: 'Tank 제약으로 가동율 조정(△20%)' },
+    { origin: 'Ruwais New Refinery', port: 'Ruwais', existing: 389, tank: 0, drone: 417, note: 'Drone Attack : S/D (FCC 내 프로필렌 Tank 손실)' },
+    { origin: 'Jebel Ali Splitter', port: 'Jebel Ali', existing: 200, tank: 0, drone: 0, note: 'Tank 제약으로 가동율 조정(△20%)' },
   ],
   'IRAQ': [
-    { origin: 'Somo', port: '', note: '' },
-    { origin: 'Basrah', port: '', note: '' },
-    { origin: 'Kurdish', port: '', note: '' },
-    { origin: 'Unusual Seller', port: '', note: 'Vitol Splitter 가동정지' },
+    { origin: 'Somo', port: '', existing: 100, tank: 25, drone: 0, note: '' },
+    { origin: 'Basrah', port: '', existing: 100, tank: 25, drone: 0, note: '' },
+    { origin: 'Kurdish', port: '', existing: 100, tank: 25, drone: 0, note: '' },
+    { origin: 'Unusual Seller', port: '', existing: 90, tank: 25, drone: 0, note: 'Vitol Splitter 가동정지' },
   ],
   'Oman': [
-    { origin: '', port: 'Duqm', note: '오만항 Drone Attack 이후 임시 Close → 현재 운영중' },
+    { origin: 'Duqm Refinery', port: 'Duqm', existing: 200, tank: 0, drone: 0, note: '오만항 Drone Attack 이후 임시 Close → 현재 운영중' },
   ],
   'Egypt': [
-    { origin: '', port: 'Suez', note: '' },
-  ]
+    { origin: '', port: 'Suez', existing: 100, tank: 0, drone: 0, note: '' },
+  ],
 };
 
 export function Dashboard() {
@@ -193,6 +193,7 @@ export function Dashboard() {
   const [butadieneTimeRange, setButadieneTimeRange] = useState('1w');
   const [freightTimeRange, setFreightTimeRange] = useState('1w');
   const [freightSpotTimeRange, setFreightSpotTimeRange] = useState('1w');
+  const [exchangeRateTimeRange, setExchangeRateTimeRange] = useState('1w');
   const [isFMExpanded, setIsFMExpanded] = useState(false);
   const [isTAExpanded, setIsTAExpanded] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -201,6 +202,11 @@ export function Dashboard() {
   const [hiddenLines, setHiddenLines] = useState<Record<string, boolean>>({});
   const [showNaphthaHelp, setShowNaphthaHelp] = useState(false);
   const [hoveredCountry, setHoveredCountry] = useState<{ show: boolean, country: string, x: number, y: number }>({ show: false, country: '', x: 0, y: 0 });
+  const [expandedFMRows, setExpandedFMRows] = useState<string[]>([]);
+  const [expandedNaphthaRows, setExpandedNaphthaRows] = useState<string[]>([]);
+  const [showFMHelp, setShowFMHelp] = useState(false);
+  const [showMoreFM, setShowMoreFM] = useState(false);
+  const [fmBaseDate, setFmBaseDate] = useState('');
 
   const handleLegendClick = (e: any) => {
     setHiddenLines(prev => ({ ...prev, [e.dataKey]: !prev[e.dataKey] }));
@@ -304,6 +310,9 @@ export function Dashboard() {
       });
       const processedFreightSpot = Object.values(freightSpotGrouped).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+      // Process Exchange Rate
+      const processedExchangeRate = [...res.exchangeRateData].sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
       setData({
         oil: processedOil,
         naturalGas: processedNG,
@@ -311,13 +320,51 @@ export function Dashboard() {
         pb: processedPB,
         freight: processedFreight,
         freightSpot: processedFreightSpot,
+        exchangeRate: processedExchangeRate,
         forceMajeure: res.forceMajeureData,
+        fmBaseDate: res.fmBaseDate,
         operatingRates: res.operatingRatesData,
         turnaround: res.turnaroundData
       });
+      setFmBaseDate(res.fmBaseDate);
       setLoading(false);
     });
   }, []);
+
+  const fmAggregated = useMemo(() => {
+    if (!data?.forceMajeure) return [];
+    
+    const commodities = Array.from(new Set(data.forceMajeure.map((item: any) => item.commodity)));
+    const result: any[] = [];
+    
+    commodities.forEach(comm => {
+      const commData = data.forceMajeure.filter((item: any) => item.commodity === comm);
+      const globalCapa = commData.reduce((sum: number, item: any) => sum + item.capacity, 0);
+      const asiaCapa = commData
+        .filter((item: any) => item.region === 'Asia')
+        .reduce((sum: number, item: any) => sum + item.capacity, 0);
+      
+      const division = commData[0]?.division || '';
+      
+      result.push({
+        commodity: comm,
+        region: 'Global',
+        capacity: globalCapa,
+        division,
+        details: commData
+      });
+      
+      result.push({
+        commodity: comm,
+        region: 'Asia',
+        capacity: asiaCapa,
+        division,
+        details: commData.filter((item: any) => item.region === 'Asia')
+      });
+    });
+    
+    return result;
+  }, [data?.forceMajeure]);
 
   const filteredData = useMemo(() => {
     if (!data) return null;
@@ -330,9 +377,10 @@ export function Dashboard() {
       propylene: filterDataByTimeRange(data.pb, propyleneTimeRange),
       butadiene: filterDataByTimeRange(data.pb, butadieneTimeRange),
       freight: filterFreightData(data.freight, freightTimeRange),
-      freightSpot: filterDataByTimeRange(data.freightSpot, freightSpotTimeRange)
+      freightSpot: filterDataByTimeRange(data.freightSpot, freightSpotTimeRange),
+      exchangeRate: filterDataByTimeRange(data.exchangeRate, exchangeRateTimeRange)
     };
-  }, [data, oilTimeRange, naturalGasTimeRange, naphthaTimeRange, ethyleneTimeRange, propyleneTimeRange, butadieneTimeRange, freightTimeRange, freightSpotTimeRange]);
+  }, [data, oilTimeRange, naturalGasTimeRange, naphthaTimeRange, ethyleneTimeRange, propyleneTimeRange, butadieneTimeRange, freightTimeRange, freightSpotTimeRange, exchangeRateTimeRange]);
 
   const freightChartData = useMemo(() => {
     if (!filteredData || !filteredData.freight) return [];
@@ -411,6 +459,16 @@ export function Dashboard() {
   const latestSCFI = revFreightSpot.find(d => d.SCFI !== undefined) || {};
   const prevSCFI = revFreightSpot.find(d => d.SCFI !== undefined && d.date !== latestSCFI.date) || {};
 
+  const revExchangeRate = [...(data?.exchangeRate || [])].reverse();
+  const latestUSD = revExchangeRate.find(d => d.USD !== undefined) || {};
+  const prevUSD = revExchangeRate.find(d => d.USD !== undefined && d.date !== latestUSD.date) || {};
+  const latestCNY = revExchangeRate.find(d => d.CNY !== undefined) || {};
+  const prevCNY = revExchangeRate.find(d => d.CNY !== undefined && d.date !== latestCNY.date) || {};
+  const latestJPY = revExchangeRate.find(d => d.JPY !== undefined) || {};
+  const prevJPY = revExchangeRate.find(d => d.JPY !== undefined && d.date !== latestJPY.date) || {};
+  const latestEUR = revExchangeRate.find(d => d.EUR !== undefined) || {};
+  const prevEUR = revExchangeRate.find(d => d.EUR !== undefined && d.date !== latestEUR.date) || {};
+
   const wtiChange = calculateChange(latestWTI.WTI, prevWTI.WTI);
   const brentChange = calculateChange(latestBrent.Brent, prevBrent.Brent);
   const dubaiChange = calculateChange(latestDubai.Dubai, prevDubai.Dubai);
@@ -428,6 +486,11 @@ export function Dashboard() {
   const cleanChange = calculateChange(latestClean.Clean, prevClean.Clean);
   const dirtyChange = calculateChange(latestDirty.Dirty, prevDirty.Dirty);
   const scfiChange = calculateChange(latestSCFI.SCFI, prevSCFI.SCFI);
+
+  const usdChange = calculateChange(latestUSD.USD, prevUSD.USD);
+  const cnyChange = calculateChange(latestCNY.CNY, prevCNY.CNY);
+  const jpyChange = calculateChange(latestJPY.JPY, prevJPY.JPY);
+  const eurChange = calculateChange(latestEUR.EUR, prevEUR.EUR);
 
   const taOngoing = filteredData?.turnaround.filter((item: any) => item.category?.includes('진행 中')) || [];
   const taPlanned = filteredData?.turnaround.filter((item: any) => item.category?.includes('조기 실시')) || [];
@@ -488,6 +551,9 @@ export function Dashboard() {
                 </button>
                 <button onClick={() => scrollToSection('force-majeure')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
                   <AlertTriangle size={14} className="text-rose-500" /> Force Majeure 현황
+                </button>
+                <button onClick={() => scrollToSection('exchange-rate')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                  <Activity size={14} className="text-yellow-500" /> 환율
                 </button>
               </div>
             </div>
@@ -559,13 +625,13 @@ export function Dashboard() {
               </div>
             </div>
 
-            <div className="flex justify-end mb-2">
-              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
+            <div className="flex justify-end mb-2 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35] flex-nowrap min-w-max">
                 {['1w', '1m', '6m', '1y'].map((range) => (
                   <button
                     key={range}
                     onClick={() => setOilTimeRange(range)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    className={`px-3 py-1.5 text-[11px] sm:text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                       oilTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
                     }`}
                   >
@@ -652,13 +718,13 @@ export function Dashboard() {
               </div>
             </div>
 
-            <div className="flex justify-end mb-2">
-              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
+            <div className="flex justify-end mb-2 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35] flex-nowrap min-w-max">
                 {['1w', '1m', '6m', '1y'].map((range) => (
                   <button
                     key={range}
                     onClick={() => setNaturalGasTimeRange(range)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    className={`px-3 py-1.5 text-[11px] sm:text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                       naturalGasTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
                     }`}
                   >
@@ -714,13 +780,13 @@ export function Dashboard() {
                 </div>
               </div>
 
-              <div className="flex justify-end mb-2">
-                <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
+              <div className="flex justify-end mb-2 overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35] flex-nowrap min-w-max">
                   {['1w', '1m', '6m', '1y'].map((range) => (
                     <button
                       key={range}
                       onClick={() => setNaphthaTimeRange(range)}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      className={`px-3 py-1.5 text-[11px] sm:text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                         naphthaTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
                       }`}
                     >
@@ -754,8 +820,8 @@ export function Dashboard() {
                   </div>
                   <p className="text-sm text-gray-400 font-medium">중동 납사 피해현황</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500">[26.03.12 기준]</span>
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">[26.03.12 기준]</span>
                   <div 
                     className="relative flex items-center justify-center text-gray-400 hover:text-white cursor-help"
                     onMouseEnter={() => setShowNaphthaHelp(true)}
@@ -796,24 +862,77 @@ export function Dashboard() {
                       { country: 'Egypt', existing: 100, tank: 0, drone: 0 },
                     ].map((row, idx) => {
                       const ratio = ((row.tank + row.drone) / row.existing) * 100;
+                      const isExpanded = expandedNaphthaRows.includes(row.country);
+                      const details = naphthaDetails[row.country] || [];
+
                       return (
-                        <tr 
-                          key={idx} 
-                          className="border-b border-[#2A2A35] hover:bg-[#2A2A35]/50 transition-colors cursor-pointer"
-                          onMouseEnter={(e) => setHoveredCountry({ show: true, country: row.country, x: e.clientX, y: e.clientY })}
-                          onMouseMove={(e) => setHoveredCountry(prev => ({ ...prev, x: e.clientX, y: e.clientY }))}
-                          onMouseLeave={() => setHoveredCountry(prev => ({ ...prev, show: false }))}
-                          onTouchStart={(e) => setHoveredCountry({ show: true, country: row.country, x: e.touches[0].clientX, y: e.touches[0].clientY })}
-                          onTouchEnd={() => setHoveredCountry(prev => ({ ...prev, show: false }))}
-                        >
-                          <td className="px-2 py-2 font-medium text-white">{row.country}</td>
-                          <td className="px-2 py-2 text-right">{row.existing.toLocaleString()}</td>
-                          <td className="px-2 py-2 text-right text-amber-500">{row.tank > 0 ? row.tank.toLocaleString() : '-'}</td>
-                          <td className="px-2 py-2 text-right text-rose-500">{row.drone > 0 ? row.drone.toLocaleString() : '-'}</td>
-                          <td className="px-2 py-2 text-right font-bold text-white">
-                            {ratio > 0 ? `${ratio.toFixed(1)}%` : '-'}
-                          </td>
-                        </tr>
+                        <React.Fragment key={idx}>
+                          <tr 
+                            className="border-b border-[#2A2A35] hover:bg-[#2A2A35]/50 transition-colors cursor-pointer"
+                            onClick={() => {
+                              setExpandedNaphthaRows(prev => 
+                                prev.includes(row.country) ? prev.filter(c => c !== row.country) : [...prev, row.country]
+                              );
+                            }}
+                          >
+                            <td className="px-2 py-2 font-medium text-white flex items-center gap-1">
+                              {row.country}
+                              {details.length > 0 && (
+                                isExpanded ? <ChevronUp size={10} className="text-gray-500" /> : <ChevronDown size={10} className="text-gray-500" />
+                              )}
+                            </td>
+                            <td className="px-2 py-2 text-right">{row.existing.toLocaleString()}</td>
+                            <td className="px-2 py-2 text-right text-amber-500">{row.tank > 0 ? row.tank.toLocaleString() : '-'}</td>
+                            <td className="px-2 py-2 text-right text-rose-500">{row.drone > 0 ? row.drone.toLocaleString() : '-'}</td>
+                            <td className="px-2 py-2 text-right font-bold text-white">
+                              {ratio > 0 ? `${ratio.toFixed(1)}%` : '-'}
+                            </td>
+                          </tr>
+                          {isExpanded && details.length > 0 && (
+                            <tr>
+                              <td colSpan={5} className="px-0 py-0">
+                                <div 
+                                  className="bg-[#1C1C24] p-3 border-b border-[#2A2A35] cursor-pointer"
+                                  onClick={() => {
+                                    setExpandedNaphthaRows(prev => prev.filter(c => c !== row.country));
+                                  }}
+                                >
+                                  <div className="grid grid-cols-1 gap-2">
+                                    {details.map((detail, dIdx) => (
+                                      <div key={dIdx} className="bg-[#2A2A35]/30 p-2 rounded-lg border border-[#2A2A35] text-[10px]">
+                                        <div className="flex justify-between mb-1">
+                                          <span className="text-gray-500">Origin:</span>
+                                          <span className="text-gray-300 font-medium">{detail.origin || '-'}</span>
+                                        </div>
+                                        <div className="flex justify-between mb-1">
+                                          <span className="text-gray-500">Port:</span>
+                                          <span className="text-gray-300 font-medium">{detail.port || '-'}</span>
+                                        </div>
+                                        <div className="flex justify-between mb-1">
+                                          <span className="text-gray-500">기존판매량:</span>
+                                          <span className="text-gray-300 font-medium">{detail.existing?.toLocaleString() || '-'}</span>
+                                        </div>
+                                        <div className="flex justify-between mb-1">
+                                          <span className="text-gray-500">Tank 제약:</span>
+                                          <span className="text-amber-500 font-medium">{detail.tank && detail.tank > 0 ? detail.tank.toLocaleString() : '-'}</span>
+                                        </div>
+                                        <div className="flex justify-between mb-1">
+                                          <span className="text-gray-500">Drone 피해:</span>
+                                          <span className="text-rose-500 font-medium">{detail.drone && detail.drone > 0 ? detail.drone.toLocaleString() : '-'}</span>
+                                        </div>
+                                        {detail.note && (
+                                          <div className="mt-1 pt-1 border-t border-[#2A2A35] text-rose-400 italic">
+                                            {detail.note}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       );
                     })}
                     <tr className="bg-[#1C1C24] font-bold border-t-2 border-[#2A2A35]">
@@ -866,13 +985,13 @@ export function Dashboard() {
               </div>
             </div>
 
-            <div className="flex justify-end mb-2">
-              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
+            <div className="flex justify-end mb-2 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35] flex-nowrap min-w-max">
                 {['1w', '1m', '6m', '1y'].map((range) => (
                   <button
                     key={range}
                     onClick={() => setEthyleneTimeRange(range)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    className={`px-3 py-1.5 text-[11px] sm:text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                       ethyleneTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
                     }`}
                   >
@@ -931,13 +1050,13 @@ export function Dashboard() {
               </div>
             </div>
 
-            <div className="flex justify-end mb-2">
-              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
+            <div className="flex justify-end mb-2 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35] flex-nowrap min-w-max">
                 {['1w', '1m', '6m', '1y'].map((range) => (
                   <button
                     key={range}
                     onClick={() => setPropyleneTimeRange(range)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    className={`px-3 py-1.5 text-[11px] sm:text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                       propyleneTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
                     }`}
                   >
@@ -996,13 +1115,13 @@ export function Dashboard() {
               </div>
             </div>
 
-            <div className="flex justify-end mb-2">
-              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
+            <div className="flex justify-end mb-2 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35] flex-nowrap min-w-max">
                 {['1w', '1m', '6m', '1y'].map((range) => (
                   <button
                     key={range}
                     onClick={() => setButadieneTimeRange(range)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    className={`px-3 py-1.5 text-[11px] sm:text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                       butadieneTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
                     }`}
                   >
@@ -1075,13 +1194,13 @@ export function Dashboard() {
                 );
               })}
             </div>
-            <div className="flex justify-end mb-2">
-              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
+            <div className="flex justify-end mb-2 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35] flex-nowrap min-w-max">
                 {['1w', '1m', '6m', '1y'].map((range) => (
                   <button
                     key={range}
                     onClick={() => setFreightSpotTimeRange(range)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    className={`px-3 py-1.5 text-[11px] sm:text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                       freightSpotTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
                     }`}
                   >
@@ -1133,7 +1252,7 @@ export function Dashboard() {
               </CardTitle>
             </div>
             <div className="text-xs text-gray-500 font-medium">
-              TD3 FFA MEG → JP
+              TD3 FFA: MEG → JP
             </div>
           </CardHeader>
           <CardContent>
@@ -1165,13 +1284,13 @@ export function Dashboard() {
                 );
               })}
             </div>
-            <div className="flex justify-end mb-2">
-              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
+            <div className="flex justify-end mb-2 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35] flex-nowrap min-w-max">
                 {['1w', '6w', '6m'].map((range) => (
                   <button
                     key={range}
                     onClick={() => setFreightTimeRange(range)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    className={`px-3 py-1.5 text-[11px] sm:text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                       freightTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
                     }`}
                   >
@@ -1220,81 +1339,316 @@ export function Dashboard() {
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Force Majeure */}
-        <Card id="force-majeure">
-          <CardHeader>
+        <Card id="force-majeure" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24] lg:col-span-1">
+          <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg flex items-center gap-2">
                 <AlertTriangle className="text-rose-500" size={20} />
                 Force Majeure 현황
               </CardTitle>
+              <div className="flex items-center gap-2">
+                {fmBaseDate && (
+                  <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">[{fmBaseDate} 기준]</span>
+                )}
+                <div className="relative">
+                <button 
+                  onMouseEnter={() => setShowFMHelp(true)}
+                  onMouseLeave={() => setShowFMHelp(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <HelpCircle size={18} />
+                </button>
+                {showFMHelp && (
+                  <div className="absolute right-0 top-6 w-48 p-3 bg-[#1C1C24] border border-[#2A2A35] rounded-xl shadow-2xl z-50 text-[11px]">
+                    <p className="text-gray-400 mb-2 font-bold">사업부별 표기</p>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span className="text-gray-300">NCC/PO</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500" />
+                        <span className="text-gray-300">PVC/가소제</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                        <span className="text-gray-300">ABS</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-rose-500" />
+                        <span className="text-gray-300">아크릴/SAP</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-purple-500" />
+                        <span className="text-gray-300">HPM</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </CardHeader>
+          </div>
+        </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="text-xs text-gray-400 uppercase bg-[#1C1C24] border-b border-[#2A2A35]">
+              <table className="w-full text-[11px] text-left text-gray-300">
+                <thead className="text-[10px] text-gray-400 bg-[#1C1C24] border-b border-[#2A2A35]">
                   <tr>
-                    <th className="px-4 py-3 rounded-tl-lg">Company</th>
-                    <th className="px-4 py-3">Country</th>
-                    <th className="px-4 py-3">Commodity</th>
-                    <th className="px-4 py-3">Capa</th>
-                    <th className="px-4 py-3 rounded-tr-lg">Period</th>
+                    <th className="px-3 py-2 font-medium">Commodity</th>
+                    <th className="px-3 py-2 font-medium">Region</th>
+                    <th className="px-3 py-2 font-medium text-right">Capa(만톤)</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {(isFMExpanded ? filteredData.forceMajeure : filteredData.forceMajeure.slice(0, 5)).map((item: any, idx: number) => (
-                    <tr key={idx} className="border-b border-[#2A2A35]/50 hover:bg-[#1C1C24]/50 transition-colors">
-                      <td className="px-4 py-3 font-medium text-white">
-                        <div className="flex items-center gap-1.5">
-                          {item.company}
-                          {item.note && item.note !== '-' && (
-                            <div className="relative">
-                              <button
-                                onMouseDown={() => setActiveNote(`fm-${idx}`)}
-                                onMouseUp={() => setActiveNote(null)}
-                                onMouseLeave={() => setActiveNote(null)}
-                                onTouchStart={() => setActiveNote(`fm-${idx}`)}
-                                onTouchEnd={() => setActiveNote(null)}
-                                className="flex items-center focus:outline-none"
-                              >
-                                <Info size={14} className="text-yellow-500" />
-                              </button>
-                              {activeNote === `fm-${idx}` && (
-                                <div className="absolute z-[100] bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#2A2A35] text-xs text-white rounded-lg shadow-xl border border-gray-600 pointer-events-none">
-                                  {item.note}
-                                </div>
-                              )}
+                  {(showMoreFM ? fmAggregated : fmAggregated.slice(0, 5)).map((row: any, idx: number) => {
+                    const isExpanded = expandedFMRows.includes(`${row.commodity}-${row.region}`);
+                    const dotColor = 
+                      row.division === 'NCC/PO' ? 'bg-emerald-500' :
+                      row.division === 'PVC/가소제' ? 'bg-blue-500' :
+                      row.division === 'ABS' ? 'bg-yellow-500' :
+                      row.division === '아크릴/SAP' ? 'bg-rose-500' :
+                      row.division === 'HPM' ? 'bg-purple-500' : 'bg-gray-500';
+
+                    return (
+                      <React.Fragment key={idx}>
+                        <tr 
+                          className="border-b border-[#2A2A35]/50 hover:bg-[#2A2A35]/50 transition-colors cursor-pointer"
+                          onClick={() => {
+                            const key = `${row.commodity}-${row.region}`;
+                            setExpandedFMRows(prev => 
+                              prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+                            );
+                          }}
+                        >
+                          <td className="px-3 py-3 font-medium text-white">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${dotColor}`} />
+                              {row.commodity}
                             </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-gray-300">{item.country}</td>
-                      <td className="px-4 py-3 text-gray-300">{item.commodity}</td>
-                      <td className="px-4 py-3 text-gray-300">{item.capacity}</td>
-                      <td className="px-4 py-3 text-gray-400 text-xs">{item.start} ~ {item.end}</td>
-                    </tr>
-                  ))}
+                          </td>
+                          <td className="px-3 py-3 text-gray-400">{row.region}</td>
+                          <td className="px-3 py-3 text-right font-bold text-white">
+                            {row.capacity > 0 ? formatNumber(row.capacity, 0) : '-'}
+                          </td>
+                        </tr>
+                        {isExpanded && (
+                          <tr>
+                            <td colSpan={3} className="px-0 py-0">
+                              <div 
+                                className="bg-[#1C1C24] p-3 border-b border-[#2A2A35] cursor-pointer"
+                                onClick={() => {
+                                  const key = `${row.commodity}-${row.region}`;
+                                  setExpandedFMRows(prev => prev.filter(k => k !== key));
+                                }}
+                              >
+                                {/* Desktop Table */}
+                                <div className="hidden sm:block overflow-x-auto">
+                                  <table className="w-full text-[10px] text-left text-gray-400">
+                                    <thead>
+                                      <tr className="border-b border-[#2A2A35]">
+                                        <th className="pb-2">Country</th>
+                                        <th className="pb-2">Company</th>
+                                        <th className="pb-2 text-right">Capa</th>
+                                        <th className="pb-2 text-center">Start</th>
+                                        <th className="pb-2 text-center">End</th>
+                                        <th className="pb-2">비고</th>
+                                        <th className="pb-2">출처</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {row.details.map((detail: any, dIdx: number) => (
+                                        <tr key={dIdx} className="border-b border-[#2A2A35]/30 last:border-0">
+                                          <td className="py-2 text-gray-300">{detail.country}</td>
+                                          <td className="py-2 text-gray-300">{detail.company}</td>
+                                          <td className="py-2 text-right text-rose-500 font-bold">{formatNumber(detail.capacity, 0)}</td>
+                                          <td className="py-2 text-center">{detail.start}</td>
+                                          <td className="py-2 text-center">{detail.end}</td>
+                                          <td className="py-2 text-[9px]">{detail.note}</td>
+                                          <td className="py-2 text-[9px]">{detail.source}</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                                {/* Mobile Card Layout */}
+                                <div className="sm:hidden space-y-2">
+                                  {row.details.map((detail: any, dIdx: number) => (
+                                    <div key={dIdx} className="bg-[#2A2A35]/30 p-3 rounded-lg border border-[#2A2A35] text-[10px]">
+                                      <div className="flex justify-between mb-1">
+                                        <span className="text-gray-500">Company:</span>
+                                        <span className="text-white font-medium">{detail.company} ({detail.country})</span>
+                                      </div>
+                                      <div className="flex justify-between mb-1">
+                                        <span className="text-gray-500">Capacity:</span>
+                                        <span className="text-rose-500 font-bold">{formatNumber(detail.capacity, 0)} 만톤</span>
+                                      </div>
+                                      <div className="flex justify-between mb-1">
+                                        <span className="text-gray-500">Period:</span>
+                                        <span className="text-gray-300">{detail.start} ~ {detail.end}</span>
+                                      </div>
+                                      {detail.note && detail.note !== '-' && (
+                                        <div className="mt-2 pt-2 border-t border-[#2A2A35] text-gray-400">
+                                          <span className="text-gray-500 mr-1">Note:</span> {detail.note}
+                                        </div>
+                                      )}
+                                      {detail.source && detail.source !== '-' && (
+                                        <div className="mt-1 text-[9px] text-gray-500 italic">
+                                          Source: {detail.source}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
-            {filteredData.forceMajeure.length > 5 && (
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={() => setIsFMExpanded(!isFMExpanded)}
-                  className="flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors bg-[#1C1C24] px-4 py-2 rounded-lg border border-[#2A2A35]"
-                >
-                  {isFMExpanded ? (
-                    <><ChevronUp size={16} /> 접기</>
-                  ) : (
-                    <><ChevronDown size={16} /> 더보기</>
-                  )}
-                </button>
-              </div>
+            {fmAggregated.length > 5 && (
+              <button 
+                onClick={() => {
+                  if (showMoreFM) {
+                    scrollToSection('force-majeure');
+                  }
+                  setShowMoreFM(!showMoreFM);
+                }}
+                className="w-full mt-4 py-2 text-[11px] text-gray-400 hover:text-white hover:bg-[#2A2A35] transition-colors rounded-lg border border-[#2A2A35] flex items-center justify-center gap-1"
+              >
+                {showMoreFM ? (
+                  <>접기 <ChevronUp size={14} /></>
+                ) : (
+                  <>더보기 <ChevronDown size={14} /></>
+                )}
+              </button>
             )}
           </CardContent>
         </Card>
+
+        {/* Exchange Rate Dashboard */}
+        <Card id="exchange-rate" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24] lg:col-span-3">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center text-yellow-500">
+                <Activity size={16} />
+              </div>
+              <p className="text-sm text-gray-400 font-medium">환율 <span className="text-gray-500 text-xs ml-1">[기준: KRW]</span></p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              {/* USD */}
+              <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                <div className="flex justify-between w-full items-center mb-2">
+                  <p className="text-xs text-gray-500 font-medium tracking-wider">미국 (USD)</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestUSD.date)}</p>
+                </div>
+                <div className="flex flex-col gap-1 w-full">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xl font-bold text-white">₩{formatNumber(latestUSD.USD, 2)}</span>
+                    <span className={`text-sm font-medium ${usdChange.color}`}>({usdChange.diffText})</span>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xs text-gray-400">전일: ₩{formatNumber(prevUSD.USD, 2)}</span>
+                    <span className={`text-[10px] font-medium ${usdChange.color}`}>({usdChange.pctText})</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* JPY */}
+              <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                <div className="flex justify-between w-full items-center mb-2">
+                  <p className="text-xs text-gray-500 font-medium tracking-wider">일본 (JPY/100)</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestJPY.date)}</p>
+                </div>
+                <div className="flex flex-col gap-1 w-full">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xl font-bold text-white">₩{formatNumber(latestJPY.JPY, 2)}</span>
+                    <span className={`text-sm font-medium ${jpyChange.color}`}>({jpyChange.diffText})</span>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xs text-gray-400">전일: ₩{formatNumber(prevJPY.JPY, 2)}</span>
+                    <span className={`text-[10px] font-medium ${jpyChange.color}`}>({jpyChange.pctText})</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* EUR */}
+              <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                <div className="flex justify-between w-full items-center mb-2">
+                  <p className="text-xs text-gray-500 font-medium tracking-wider">유럽연합 (EUR)</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestEUR.date)}</p>
+                </div>
+                <div className="flex flex-col gap-1 w-full">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xl font-bold text-white">₩{formatNumber(latestEUR.EUR, 2)}</span>
+                    <span className={`text-sm font-medium ${eurChange.color}`}>({eurChange.diffText})</span>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xs text-gray-400">전일: ₩{formatNumber(prevEUR.EUR, 2)}</span>
+                    <span className={`text-[10px] font-medium ${eurChange.color}`}>({eurChange.pctText})</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* CNY */}
+              <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                <div className="flex justify-between w-full items-center mb-2">
+                  <p className="text-xs text-gray-500 font-medium tracking-wider">중국 (CNY)</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestCNY.date)}</p>
+                </div>
+                <div className="flex flex-col gap-1 w-full">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xl font-bold text-white">₩{formatNumber(latestCNY.CNY, 2)}</span>
+                    <span className={`text-sm font-medium ${cnyChange.color}`}>({cnyChange.diffText})</span>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xs text-gray-400">전일: ₩{formatNumber(prevCNY.CNY, 2)}</span>
+                    <span className={`text-[10px] font-medium ${cnyChange.color}`}>({cnyChange.pctText})</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end mb-4 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35] flex-nowrap min-w-max">
+                {['1w', '1m', '6m', '1y'].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setExchangeRateTimeRange(range)}
+                    className={`px-3 py-1.5 text-[11px] sm:text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
+                      exchangeRateTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {range === '1w' ? '1주' : range === '1m' ? '1개월' : range === '6m' ? '6개월' : '1년'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="h-[300px] sm:h-[400px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={filteredData.exchangeRate} margin={{ top: 10, right: 30, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
+                  <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="left" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                  <YAxis yAxisId="right" orientation="right" stroke="#a855f7" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '11px', paddingTop: '20px', cursor: 'pointer' }} />
+                  <Line hide={hiddenLines['USD']} yAxisId="left" type="monotone" dataKey="USD" name="미국(USD)" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Line hide={hiddenLines['JPY']} yAxisId="left" type="monotone" dataKey="JPY" name="일본(JPY/100)" stroke="#10b981" strokeWidth={2} dot={false} />
+                  <Line hide={hiddenLines['EUR']} yAxisId="left" type="monotone" dataKey="EUR" name="유럽연합(EUR)" stroke="#f97316" strokeWidth={2} dot={false} />
+                  <Line hide={hiddenLines['CNY']} yAxisId="right" type="monotone" dataKey="CNY" name="중국(CNY)(우)" stroke="#a855f7" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-      </div>
+    </div>
       {/* Country Details Tooltip */}
       {hoveredCountry.show && naphthaDetails[hoveredCountry.country] && (
         <div 
