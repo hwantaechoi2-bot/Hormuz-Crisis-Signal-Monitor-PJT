@@ -2,11 +2,21 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/Card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Legend } from 'recharts';
 import { fetchDashboardData } from '../data/fetchData';
-import { TrendingUp, TrendingDown, AlertTriangle, Activity, Ship, Droplet, Factory, Settings, ChevronUp, ChevronDown, Info, Menu, X } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Activity, Ship, Droplet, Factory, Settings, ChevronUp, ChevronDown, Info, Menu, X, Flame } from 'lucide-react';
 
 const formatNumber = (num: number | undefined, decimals: number = 2) => {
   if (num === undefined || num === null) return '-';
   return num.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+};
+
+const formatDateShort = (dateStr: string | undefined) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  const yy = String(date.getFullYear()).slice(-2);
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${yy}.${mm}.${dd}`;
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -108,20 +118,51 @@ const filterFreightData = (dataList: any[], range: string) => {
   return dataList;
 };
 
+const formatHeaderTime = (date: Date) => {
+  const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+  const kst = new Date(utc + (9 * 3600000));
+  
+  const yy = kst.getFullYear().toString().slice(2);
+  const mm = (kst.getMonth() + 1).toString().padStart(2, '0');
+  const dd = kst.getDate().toString().padStart(2, '0');
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
+  const day = days[kst.getDay()];
+  
+  const ampm = kst.getHours() >= 12 ? 'PM' : 'AM';
+  const hh = (kst.getHours() % 12 || 12).toString().padStart(2, '0');
+  const min = kst.getMinutes().toString().padStart(2, '0');
+  const ss = kst.getSeconds().toString().padStart(2, '0');
+
+  return `${yy}.${mm}.${dd}(${day}) / KST ${ampm} ${hh}:${min}:${ss}`;
+};
+
 export function Dashboard() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [oilTimeRange, setOilTimeRange] = useState('1y');
-  const [naturalGasTimeRange, setNaturalGasTimeRange] = useState('1y');
-  const [naphthaTimeRange, setNaphthaTimeRange] = useState('1y');
-  const [ethyleneTimeRange, setEthyleneTimeRange] = useState('1y');
-  const [freightTimeRange, setFreightTimeRange] = useState('6m');
-  const [freightSpotTimeRange, setFreightSpotTimeRange] = useState('1y');
+  const [oilTimeRange, setOilTimeRange] = useState('1w');
+  const [naturalGasTimeRange, setNaturalGasTimeRange] = useState('1w');
+  const [naphthaTimeRange, setNaphthaTimeRange] = useState('1w');
+  const [ethyleneTimeRange, setEthyleneTimeRange] = useState('1w');
+  const [propyleneTimeRange, setPropyleneTimeRange] = useState('1w');
+  const [butadieneTimeRange, setButadieneTimeRange] = useState('1w');
+  const [freightTimeRange, setFreightTimeRange] = useState('1w');
+  const [freightSpotTimeRange, setFreightSpotTimeRange] = useState('1w');
   const [isFMExpanded, setIsFMExpanded] = useState(false);
   const [isTAExpanded, setIsTAExpanded] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeNote, setActiveNote] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hiddenLines, setHiddenLines] = useState<Record<string, boolean>>({});
+
+  const handleLegendClick = (e: any) => {
+    setHiddenLines(prev => ({ ...prev, [e.dataKey]: !prev[e.dataKey] }));
+  };
+
+  const renderLegendText = (value: string, entry: any) => {
+    const { dataKey } = entry;
+    const isHidden = hiddenLines[dataKey];
+    return <span style={{ textDecoration: isHidden ? 'line-through' : 'none', color: isHidden ? '#6b7280' : entry.color, cursor: 'pointer' }}>{value}</span>;
+  };
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -173,6 +214,23 @@ export function Dashboard() {
         }
       });
 
+      // Process Propylene & Butadiene
+      const pbGrouped: any = {};
+      res.pbData.forEach(row => {
+        if (!pbGrouped[row.date]) pbGrouped[row.date] = { date: row.date };
+        if (row.name.includes('프로필렌')) pbGrouped[row.date].Propylene = row.price;
+        if (row.name.includes('부타디엔')) pbGrouped[row.date].Butadiene = row.price;
+      });
+      const processedPB = Object.values(pbGrouped).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      processedPB.forEach((row: any) => {
+        // Find corresponding Naphtha price for the same date
+        const neRow: any = processedNE.find((ne: any) => ne.date === row.date);
+        if (neRow && neRow.Naphtha !== undefined) {
+          if (row.Propylene !== undefined) row.PropyleneSpread = row.Propylene - neRow.Naphtha;
+          if (row.Butadiene !== undefined) row.ButadieneSpread = row.Butadiene - neRow.Naphtha;
+        }
+      });
+
       // Process Freight
       const freightGrouped: any = {};
       res.freightData.forEach(row => {
@@ -202,6 +260,7 @@ export function Dashboard() {
         oil: processedOil,
         naturalGas: processedNG,
         ne: processedNE,
+        pb: processedPB,
         freight: processedFreight,
         freightSpot: processedFreightSpot,
         forceMajeure: res.forceMajeureData,
@@ -220,10 +279,12 @@ export function Dashboard() {
       naturalGas: filterDataByTimeRange(data.naturalGas, naturalGasTimeRange),
       naphtha: filterDataByTimeRange(data.ne, naphthaTimeRange),
       ethylene: filterDataByTimeRange(data.ne, ethyleneTimeRange),
+      propylene: filterDataByTimeRange(data.pb, propyleneTimeRange),
+      butadiene: filterDataByTimeRange(data.pb, butadieneTimeRange),
       freight: filterFreightData(data.freight, freightTimeRange),
       freightSpot: filterDataByTimeRange(data.freightSpot, freightSpotTimeRange)
     };
-  }, [data, oilTimeRange, naturalGasTimeRange, naphthaTimeRange, ethyleneTimeRange, freightTimeRange, freightSpotTimeRange]);
+  }, [data, oilTimeRange, naturalGasTimeRange, naphthaTimeRange, ethyleneTimeRange, propyleneTimeRange, butadieneTimeRange, freightTimeRange, freightSpotTimeRange]);
 
   const freightChartData = useMemo(() => {
     if (!filteredData || !filteredData.freight) return [];
@@ -277,6 +338,17 @@ export function Dashboard() {
   const latestSpread = revNE.find(d => d.Spread !== undefined) || {};
   const prevSpread = revNE.find(d => d.Spread !== undefined && d.date !== latestSpread.date) || {};
 
+  const revPB = [...(data?.pb || [])].reverse();
+  const latestPropylene = revPB.find(d => d.Propylene !== undefined) || {};
+  const prevPropylene = revPB.find(d => d.Propylene !== undefined && d.date !== latestPropylene.date) || {};
+  const latestPropyleneSpread = revPB.find(d => d.PropyleneSpread !== undefined) || {};
+  const prevPropyleneSpread = revPB.find(d => d.PropyleneSpread !== undefined && d.date !== latestPropyleneSpread.date) || {};
+  
+  const latestButadiene = revPB.find(d => d.Butadiene !== undefined) || {};
+  const prevButadiene = revPB.find(d => d.Butadiene !== undefined && d.date !== latestButadiene.date) || {};
+  const latestButadieneSpread = revPB.find(d => d.ButadieneSpread !== undefined) || {};
+  const prevButadieneSpread = revPB.find(d => d.ButadieneSpread !== undefined && d.date !== latestButadieneSpread.date) || {};
+
   const revFreight = [...(data?.freight || [])].reverse();
   const latestFreight = revFreight.find(d => d['3월물'] !== undefined || d['4월물'] !== undefined) || {};
   const prevFreight = revFreight.find(d => (d['3월물'] !== undefined || d['4월물'] !== undefined) && d.date !== latestFreight.date) || {};
@@ -301,6 +373,8 @@ export function Dashboard() {
 
   const naphthaChange = calculateChange(latestNaphtha.Naphtha, prevNaphtha.Naphtha);
   const ethyleneChange = calculateChange(latestEthylene.Ethylene, prevEthylene.Ethylene);
+  const propyleneChange = calculateChange(latestPropylene.Propylene, prevPropylene.Propylene);
+  const butadieneChange = calculateChange(latestButadiene.Butadiene, prevButadiene.Butadiene);
 
   const bdiChange = calculateChange(latestBDI.BDI, prevBDI.BDI);
   const cleanChange = calculateChange(latestClean.Clean, prevClean.Clean);
@@ -315,16 +389,16 @@ export function Dashboard() {
       {/* Header */}
       <div className="sticky top-0 z-50 bg-[#0B0B0F]/95 backdrop-blur-sm border-b border-[#2A2A35] mb-4 sm:mb-6">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 md:py-6 flex justify-between items-center gap-3 sm:gap-4 relative">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
+            <h1 className="text-lg sm:text-2xl font-bold text-white flex items-center gap-2">
               <Activity className="text-purple-500 w-5 h-5 sm:w-6 sm:h-6" />
               Hormuz Crisis Signal Monitor
             </h1>
+            <div className="text-[11px] sm:text-sm font-medium text-gray-400 ml-7 sm:ml-0">
+              {formatHeaderTime(currentTime)}
+            </div>
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
-            <div className="text-xs sm:text-sm font-medium text-gray-400 hidden sm:block">
-              {currentTime.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })} {currentTime.toLocaleTimeString('ko-KR', { hour12: false })}
-            </div>
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-lg bg-[#1C1C24] border border-[#2A2A35] text-gray-400 hover:text-white transition-colors"
@@ -341,13 +415,19 @@ export function Dashboard() {
                   <Droplet size={14} className="text-blue-500" /> 원유 / CRUDE OIL
                 </button>
                 <button onClick={() => scrollToSection('natural-gas')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <Droplet size={14} className="text-emerald-500" /> 천연가스
+                  <Flame size={14} className="text-emerald-500" /> 천연가스
                 </button>
                 <button onClick={() => scrollToSection('naphtha')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
                   <Factory size={14} className="text-purple-500" /> 납사(MOPJ)
                 </button>
                 <button onClick={() => scrollToSection('ethylene')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
                   <Activity size={14} className="text-amber-500" /> 에틸렌(CFR NEA)
+                </button>
+                <button onClick={() => scrollToSection('propylene')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                  <Activity size={14} className="text-cyan-500" /> 프로필렌(FOB Korea,Poly)
+                </button>
+                <button onClick={() => scrollToSection('butadiene')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                  <Activity size={14} className="text-pink-500" /> 부타디엔(FOB Korea)
                 </button>
                 <button onClick={() => scrollToSection('freight-spot')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
                   <Ship size={14} className="text-indigo-400" /> 운임(현물)
@@ -378,9 +458,12 @@ export function Dashboard() {
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
-              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">WTI</p>
-                <div className="flex flex-col gap-1">
+              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                <div className="flex justify-between w-full items-center mb-1">
+                  <p className="text-[10px] text-gray-500 font-medium tracking-wider">WTI</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestWTI.date)}</p>
+                </div>
+                <div className="flex flex-col gap-1 w-full">
                   <div className="flex items-baseline gap-2">
                     <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestWTI.WTI, 2)}</span>
                     <span className={`text-sm font-medium ${wtiChange.color}`}>({wtiChange.diffText})</span>
@@ -391,9 +474,12 @@ export function Dashboard() {
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">BRENT</p>
-                <div className="flex flex-col gap-1">
+              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                <div className="flex justify-between w-full items-center mb-1">
+                  <p className="text-[10px] text-gray-500 font-medium tracking-wider">BRENT</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestBrent.date)}</p>
+                </div>
+                <div className="flex flex-col gap-1 w-full">
                   <div className="flex items-baseline gap-2">
                     <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestBrent.Brent, 2)}</span>
                     <span className={`text-sm font-medium ${brentChange.color}`}>({brentChange.diffText})</span>
@@ -404,9 +490,12 @@ export function Dashboard() {
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">DUBAI</p>
-                <div className="flex flex-col gap-1">
+              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                <div className="flex justify-between w-full items-center mb-1">
+                  <p className="text-[10px] text-gray-500 font-medium tracking-wider">DUBAI</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestDubai.date)}</p>
+                </div>
+                <div className="flex flex-col gap-1 w-full">
                   <div className="flex items-baseline gap-2">
                     <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestDubai.Dubai, 2)}</span>
                     <span className={`text-sm font-medium ${dubaiChange.color}`}>({dubaiChange.diffText})</span>
@@ -441,10 +530,10 @@ export function Dashboard() {
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                  <Line type="monotone" dataKey="WTI" stroke="#f97316" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="Brent" stroke="#10b981" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="Dubai" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
+                  <Line hide={hiddenLines['WTI']} type="monotone" dataKey="WTI" stroke="#f97316" strokeWidth={2} dot={false} />
+                  <Line hide={hiddenLines['Brent']} type="monotone" dataKey="Brent" stroke="#10b981" strokeWidth={2} dot={false} />
+                  <Line hide={hiddenLines['Dubai']} type="monotone" dataKey="Dubai" stroke="#3b82f6" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -456,15 +545,18 @@ export function Dashboard() {
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                <Droplet size={16} />
+                <Flame size={16} />
               </div>
               <p className="text-sm text-gray-400 font-medium">천연가스 <span className="text-gray-500 text-xs ml-1">[단위: $/MMBtu]</span></p>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
-              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">미국(Henry Hub)</p>
-                <div className="flex flex-col gap-1">
+              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                <div className="flex justify-between w-full items-center mb-1">
+                  <p className="text-[10px] text-gray-500 font-medium tracking-wider">미국(Henry Hub)</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestUS.date)}</p>
+                </div>
+                <div className="flex flex-col gap-1 w-full">
                   <div className="flex items-baseline gap-2">
                     <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestUS.US, 2)}</span>
                     <span className={`text-sm font-medium ${usChange.color}`}>({usChange.diffText})</span>
@@ -475,9 +567,12 @@ export function Dashboard() {
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">아시아(JKM)</p>
-                <div className="flex flex-col gap-1">
+              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                <div className="flex justify-between w-full items-center mb-1">
+                  <p className="text-[10px] text-gray-500 font-medium tracking-wider">아시아(JKM)</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestAsia.date)}</p>
+                </div>
+                <div className="flex flex-col gap-1 w-full">
                   <div className="flex items-baseline gap-2">
                     <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestAsia.Asia, 2)}</span>
                     <span className={`text-sm font-medium ${asiaChange.color}`}>({asiaChange.diffText})</span>
@@ -488,9 +583,12 @@ export function Dashboard() {
                   </div>
                 </div>
               </div>
-              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">유럽(TTF)</p>
-                <div className="flex flex-col gap-1">
+              <div className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                <div className="flex justify-between w-full items-center mb-1">
+                  <p className="text-[10px] text-gray-500 font-medium tracking-wider">유럽(TTF)</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestEurope.date)}</p>
+                </div>
+                <div className="flex flex-col gap-1 w-full">
                   <div className="flex items-baseline gap-2">
                     <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestEurope.Europe, 2)}</span>
                     <span className={`text-sm font-medium ${europeChange.color}`}>({europeChange.diffText})</span>
@@ -525,10 +623,10 @@ export function Dashboard() {
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                  <Line type="monotone" dataKey="US" name="미국" stroke="#f97316" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="Asia" name="아시아" stroke="#10b981" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="Europe" name="유럽" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
+                  <Line hide={hiddenLines['US']} type="monotone" dataKey="US" name="미국" stroke="#f97316" strokeWidth={2} dot={false} />
+                  <Line hide={hiddenLines['Asia']} type="monotone" dataKey="Asia" name="아시아" stroke="#10b981" strokeWidth={2} dot={false} />
+                  <Line hide={hiddenLines['Europe']} type="monotone" dataKey="Europe" name="유럽" stroke="#3b82f6" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -545,8 +643,12 @@ export function Dashboard() {
               <p className="text-sm text-gray-400 font-medium">납사(MOPJ) <span className="text-gray-500 text-xs ml-1">[단위: $/톤]</span></p>
             </div>
             
-            <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4">
-              <div className="flex flex-col gap-1">
+            <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start">
+              <div className="flex flex-col gap-1 w-full">
+                <div className="flex justify-between w-full items-center mb-1">
+                  <p className="text-[10px] text-gray-500 font-medium tracking-wider">납사</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestNaphtha.date)}</p>
+                </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestNaphtha.Naphtha, 2)}</span>
                   <span className={`text-sm font-medium ${naphthaChange.color}`}>({naphthaChange.diffText})</span>
@@ -580,7 +682,8 @@ export function Dashboard() {
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Line type="monotone" dataKey="Naphtha" stroke="#a855f7" strokeWidth={2} dot={false} />
+                  <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
+                  <Line hide={hiddenLines['Naphtha']} type="monotone" dataKey="Naphtha" stroke="#a855f7" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -598,7 +701,11 @@ export function Dashboard() {
             </div>
             
             <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full">
+                <div className="flex justify-between w-full items-center mb-1">
+                  <p className="text-[10px] text-gray-500 font-medium tracking-wider">에틸렌</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestEthylene.date)}</p>
+                </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestEthylene.Ethylene, 2)}</span>
                   <span className={`text-sm font-medium ${ethyleneChange.color}`}>({ethyleneChange.diffText})</span>
@@ -608,9 +715,9 @@ export function Dashboard() {
                   <span className={`text-[10px] font-medium ${ethyleneChange.color}`}>({ethyleneChange.pctText})</span>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right min-w-[100px]">
                 <p className="text-[10px] text-gray-500 font-medium mb-1">에틸렌 Spread</p>
-                <p className={`text-lg lg:text-xl font-bold ${latestSpread.Spread !== undefined && latestSpread.Spread < 300 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                <p className={`text-lg lg:text-xl font-bold ${latestSpread.Spread !== undefined && latestSpread.Spread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                   ${formatNumber(latestSpread.Spread, 2)}
                 </p>
               </div>
@@ -636,11 +743,142 @@ export function Dashboard() {
                 <LineChart data={filteredData.ethylene} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                  <YAxis yAxisId="left" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                  <YAxis yAxisId="right" orientation="right" stroke="#ffffff" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                  <Line type="monotone" dataKey="Ethylene" stroke="#ffffff" strokeWidth={2} dot={false} connectNulls={true} />
-                  <Line type="monotone" dataKey="Spread" stroke="#ef4444" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} />
+                  <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
+                  <Line hide={hiddenLines['Ethylene']} yAxisId="left" type="monotone" dataKey="Ethylene" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} />
+                  <Line hide={hiddenLines['Spread']} yAxisId="right" type="monotone" dataKey="Spread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Propylene Spot */}
+        <Card id="propylene" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24]">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-500">
+                <Activity size={16} />
+              </div>
+              <p className="text-sm text-gray-400 font-medium">프로필렌(FOB Korea,Poly) <span className="text-gray-500 text-xs ml-1">[단위: $/톤]</span></p>
+            </div>
+            
+            <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start">
+              <div className="flex flex-col gap-1 w-full">
+                <div className="flex justify-between w-full items-center mb-1">
+                  <p className="text-[10px] text-gray-500 font-medium tracking-wider">프로필렌</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestPropylene.date)}</p>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestPropylene.Propylene, 2)}</span>
+                  <span className={`text-sm font-medium ${propyleneChange.color}`}>({propyleneChange.diffText})</span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xs text-gray-400">전일: ${formatNumber(prevPropylene.Propylene, 2)}</span>
+                  <span className={`text-[10px] font-medium ${propyleneChange.color}`}>({propyleneChange.pctText})</span>
+                </div>
+              </div>
+              <div className="text-right min-w-[100px]">
+                <p className="text-[10px] text-gray-500 font-medium mb-1">프로필렌 Spread</p>
+                <p className={`text-lg lg:text-xl font-bold ${latestPropyleneSpread.PropyleneSpread !== undefined && latestPropyleneSpread.PropyleneSpread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                  ${formatNumber(latestPropyleneSpread.PropyleneSpread, 2)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end mb-2">
+              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
+                {['1w', '1m', '6m', '1y'].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setPropyleneTimeRange(range)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      propyleneTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {range === '1w' ? '1주' : range === '1m' ? '1개월' : range === '6m' ? '6개월' : '1년'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="h-48 w-full mt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={filteredData.propylene} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
+                  <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="left" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                  <YAxis yAxisId="right" orientation="right" stroke="#ffffff" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
+                  <Line hide={hiddenLines['Propylene']} yAxisId="left" type="monotone" dataKey="Propylene" stroke="#06b6d4" strokeWidth={2} dot={false} connectNulls={true} />
+                  <Line hide={hiddenLines['PropyleneSpread']} yAxisId="right" type="monotone" dataKey="PropyleneSpread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Butadiene Spot */}
+        <Card id="butadiene" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24]">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center text-pink-500">
+                <Activity size={16} />
+              </div>
+              <p className="text-sm text-gray-400 font-medium">부타디엔(FOB Korea) <span className="text-gray-500 text-xs ml-1">[단위: $/톤]</span></p>
+            </div>
+            
+            <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start">
+              <div className="flex flex-col gap-1 w-full">
+                <div className="flex justify-between w-full items-center mb-1">
+                  <p className="text-[10px] text-gray-500 font-medium tracking-wider">부타디엔</p>
+                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestButadiene.date)}</p>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestButadiene.Butadiene, 2)}</span>
+                  <span className={`text-sm font-medium ${butadieneChange.color}`}>({butadieneChange.diffText})</span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xs text-gray-400">전일: ${formatNumber(prevButadiene.Butadiene, 2)}</span>
+                  <span className={`text-[10px] font-medium ${butadieneChange.color}`}>({butadieneChange.pctText})</span>
+                </div>
+              </div>
+              <div className="text-right min-w-[100px]">
+                <p className="text-[10px] text-gray-500 font-medium mb-1">부타디엔 Spread</p>
+                <p className={`text-lg lg:text-xl font-bold ${latestButadieneSpread.ButadieneSpread !== undefined && latestButadieneSpread.ButadieneSpread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                  ${formatNumber(latestButadieneSpread.ButadieneSpread, 2)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end mb-2">
+              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
+                {['1w', '1m', '6m', '1y'].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setButadieneTimeRange(range)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      butadieneTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {range === '1w' ? '1주' : range === '1m' ? '1개월' : range === '6m' ? '6개월' : '1년'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="h-48 w-full mt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={filteredData.butadiene} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
+                  <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="left" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                  <YAxis yAxisId="right" orientation="right" stroke="#ffffff" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
+                  <Line hide={hiddenLines['Butadiene']} yAxisId="left" type="monotone" dataKey="Butadiene" stroke="#ec4899" strokeWidth={2} dot={false} connectNulls={true} />
+                  <Line hide={hiddenLines['ButadieneSpread']} yAxisId="right" type="monotone" dataKey="ButadieneSpread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -666,27 +904,28 @@ export function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 gap-2 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-4">
               {[
-                { label: 'BDI', latest: latestBDI.BDI, prev: prevBDI.BDI, unit: '', decimals: 2 },
-                { label: 'SCFI', latest: latestSCFI.SCFI, prev: prevSCFI.SCFI, unit: '', decimals: 2 },
-                { label: 'Dirty (원유)', latest: latestDirty.Dirty, prev: prevDirty.Dirty, unit: '$', decimals: 2 },
-                { label: 'Clean (정제유/납사)', latest: latestClean.Clean, prev: prevClean.Clean, unit: '$', decimals: 2 },
+                { label: 'BDI', latest: latestBDI.BDI, prev: prevBDI.BDI, date: latestBDI.date, unit: '', decimals: 2 },
+                { label: 'SCFI', latest: latestSCFI.SCFI, prev: prevSCFI.SCFI, date: latestSCFI.date, unit: '', decimals: 2 },
+                { label: 'Dirty (원유)', latest: latestDirty.Dirty, prev: prevDirty.Dirty, date: latestDirty.date, unit: '$', decimals: 2 },
+                { label: 'Clean (정제유/납사)', latest: latestClean.Clean, prev: prevClean.Clean, date: latestClean.date, unit: '$', decimals: 2 },
               ].map((item) => {
                 const change = calculateChange(item.latest, item.prev);
                 return (
-                  <div key={item.label} className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                    <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">{item.label}</p>
-                    <div className="flex justify-between items-end">
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-lg lg:text-xl font-bold text-white">{item.unit}{formatNumber(item.latest, item.decimals)}</span>
-                          <span className={`text-sm font-medium ${change.color}`}>({change.diffText})</span>
-                        </div>
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-xs text-gray-400">전일: {item.unit}{formatNumber(item.prev, item.decimals)}</span>
-                          <span className={`text-[10px] font-medium ${change.color}`}>({change.pctText})</span>
-                        </div>
+                  <div key={item.label} className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                    <div className="flex justify-between w-full items-center mb-1">
+                      <p className="text-[10px] text-gray-500 font-medium tracking-wider">{item.label}</p>
+                      <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(item.date)}</p>
+                    </div>
+                    <div className="flex flex-col gap-1 w-full">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-lg lg:text-xl font-bold text-white">{item.unit}{formatNumber(item.latest, item.decimals)}</span>
+                        <span className={`text-sm font-medium ${change.color}`}>({change.diffText})</span>
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xs text-gray-400">전일: {item.unit}{formatNumber(item.prev, item.decimals)}</span>
+                        <span className={`text-[10px] font-medium ${change.color}`}>({change.pctText})</span>
                       </div>
                     </div>
                   </div>
@@ -716,10 +955,10 @@ export function Dashboard() {
                     <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                     <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                    <Line type="monotone" dataKey="Clean" name="Clean" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} />
-                    <Line type="monotone" dataKey="Dirty" name="Dirty" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} />
-                    <Line type="monotone" dataKey="BDI" name="BDI" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} />
+                    <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
+                    <Line hide={hiddenLines['Clean']} type="monotone" dataKey="Clean" name="Clean" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} />
+                    <Line hide={hiddenLines['Dirty']} type="monotone" dataKey="Dirty" name="Dirty" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} />
+                    <Line hide={hiddenLines['BDI']} type="monotone" dataKey="BDI" name="BDI" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -730,8 +969,8 @@ export function Dashboard() {
                     <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                     <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                    <Line type="monotone" dataKey="SCFI" name="SCFI" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} />
+                    <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
+                    <Line hide={hiddenLines['SCFI']} type="monotone" dataKey="SCFI" name="SCFI" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -755,18 +994,21 @@ export function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 gap-2 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-4">
               {[
-                { label: '3월물', latest: latestFreight['3월물'], prev: prevFreight['3월물'] },
-                { label: '4월물', latest: latestFreight['4월물'], prev: prevFreight['4월물'] },
-                { label: '5월물', latest: latestFreight['5월물'], prev: prevFreight['5월물'] },
-                { label: '6월물', latest: latestFreight['6월물'], prev: prevFreight['6월물'] },
+                { label: '3월물', latest: latestFreight['3월물'], prev: prevFreight['3월물'], date: latestFreight.date },
+                { label: '4월물', latest: latestFreight['4월물'], prev: prevFreight['4월물'], date: latestFreight.date },
+                { label: '5월물', latest: latestFreight['5월물'], prev: prevFreight['5월물'], date: latestFreight.date },
+                { label: '6월물', latest: latestFreight['6월물'], prev: prevFreight['6월물'], date: latestFreight.date },
               ].map((item) => {
                 const change = calculateChange(item.latest, item.prev);
                 return (
-                  <div key={item.label} className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col">
-                    <p className="text-[10px] text-gray-500 font-medium tracking-wider mb-1">{item.label}</p>
-                    <div className="flex flex-col gap-1">
+                  <div key={item.label} className="bg-[#1C1C24] p-3 rounded-xl border border-[#2A2A35] flex flex-col justify-between items-start">
+                    <div className="flex justify-between w-full items-center mb-1">
+                      <p className="text-[10px] text-gray-500 font-medium tracking-wider">{item.label}</p>
+                      <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(item.date)}</p>
+                    </div>
+                    <div className="flex flex-col gap-1 w-full">
                       <div className="flex items-baseline gap-2">
                         <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(item.latest, 2)}</span>
                         <span className={`text-sm font-medium ${change.color}`}>({change.diffText})</span>
@@ -802,7 +1044,7 @@ export function Dashboard() {
                   <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                  <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
                   {freightDates.map((date, idx) => {
                     const isLatest = idx === freightDates.length - 1;
                     const isPrev = idx === freightDates.length - 2;
@@ -810,6 +1052,7 @@ export function Dashboard() {
                     const color = isLatest ? '#3b82f6' : isPrev ? '#10b981' : `rgba(107, 114, 128, ${opacity})`;
                     return (
                       <Line 
+                        hide={hiddenLines[date]}
                         key={date} 
                         type="monotone" 
                         dataKey={date} 

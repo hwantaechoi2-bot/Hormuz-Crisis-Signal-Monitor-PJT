@@ -6,6 +6,8 @@ const GIDS = {
   OIL: '1178400251',
   NATURAL_GAS: '858636807',
   NAPHTHA_ETHYLENE: '224484968',
+  PROPYLENE: '1772810748',
+  BUTADIENE: '638440156',
   FREIGHT: '0',
   FREIGHT_SPOT: '340864639',
   FREIGHT_CONTAINER: '896888630',
@@ -25,6 +27,8 @@ export async function fetchDashboardData() {
     oilDataRaw,
     naturalGasRaw,
     naphthaEthyleneRaw,
+    propyleneRaw,
+    butadieneRaw,
     freightRaw,
     freightSpotRaw,
     freightContainerRaw,
@@ -35,6 +39,8 @@ export async function fetchDashboardData() {
     fetchCsv(GIDS.OIL),
     fetchCsv(GIDS.NATURAL_GAS),
     fetchCsv(GIDS.NAPHTHA_ETHYLENE),
+    fetchCsv(GIDS.PROPYLENE),
+    fetchCsv(GIDS.BUTADIENE),
     fetchCsv(GIDS.FREIGHT),
     fetchCsv(GIDS.FREIGHT_SPOT),
     fetchCsv(GIDS.FREIGHT_CONTAINER),
@@ -64,6 +70,20 @@ export async function fetchDashboardData() {
     name: row[2],
     price: parseFloat(row[3])
   })).filter(row => row.date && !isNaN(row.price));
+
+  // Parse Propylene & Butadiene
+  const pbData = [
+    ...propyleneRaw.slice(1).map(row => ({
+      date: row[1],
+      name: row[2],
+      price: parseFloat(row[3])
+    })).filter(row => row.date && !isNaN(row.price)),
+    ...butadieneRaw.slice(1).map(row => ({
+      date: row[1],
+      name: row[2],
+      price: parseFloat(row[3])
+    })).filter(row => row.date && !isNaN(row.price))
+  ];
 
   // Parse Freight Futures
   const freightData = freightRaw.slice(2).map(row => ({
@@ -131,6 +151,7 @@ export async function fetchDashboardData() {
     oilData,
     naturalGasData,
     neData,
+    pbData,
     freightData,
     freightSpotData,
     freightContainerData,
