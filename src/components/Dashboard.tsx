@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/Card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Legend } from 'recharts';
 import { fetchDashboardData } from '../data/fetchData';
-import { TrendingUp, TrendingDown, AlertTriangle, Activity, Ship, Droplet, Factory, Settings, ChevronUp, ChevronDown, Info, Menu, X, Flame } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Activity, Ship, Droplet, Factory, Settings, ChevronUp, ChevronDown, Info, Menu, X, Flame, HelpCircle } from 'lucide-react';
 
 const formatNumber = (num: number | undefined, decimals: number = 2) => {
   if (num === undefined || num === null) return '-';
@@ -122,7 +122,7 @@ const formatHeaderTime = (date: Date) => {
   const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
   const kst = new Date(utc + (9 * 3600000));
   
-  const yy = kst.getFullYear().toString().slice(2);
+  const yyyy = kst.getFullYear().toString();
   const mm = (kst.getMonth() + 1).toString().padStart(2, '0');
   const dd = kst.getDate().toString().padStart(2, '0');
   const days = ['일', '월', '화', '수', '목', '금', '토'];
@@ -133,7 +133,53 @@ const formatHeaderTime = (date: Date) => {
   const min = kst.getMinutes().toString().padStart(2, '0');
   const ss = kst.getSeconds().toString().padStart(2, '0');
 
-  return `${yy}.${mm}.${dd}(${day}) / KST ${ampm} ${hh}:${min}:${ss}`;
+  return `${yyyy}.${mm}.${dd}(${day}) / ${hh}:${min}:${ss} (${ampm}) [KST 기준]`;
+};
+
+const naphthaDetails: Record<string, { origin: string, port: string, note: string }[]> = {
+  'Kuwait': [
+    { origin: 'Mina Al-Ahmadi Refinery', port: 'MAA+MAB', note: '' },
+    { origin: 'Mina Abdulla Refinery', port: 'MAB', note: 'Tank 제약으로 S/D' },
+    { origin: 'Al-Zour', port: 'Mina Al Zour', note: 'Tank 제약으로 가동율 조정(△25%)' },
+  ],
+  'Saudi': [
+    { origin: 'Yanbu Refinery', port: 'Yanbu', note: '사우디 West' },
+    { origin: 'Rabigh Refinery', port: 'Rabigh', note: '사우디 West' },
+    { origin: 'Jubail(Shell/Aramco)', port: 'Jubail', note: '' },
+    { origin: 'Ras Tanura Refinery', port: 'Ras Tanura', note: 'Drone attack : Main 설비 이상 없음, 현재 재가동 준비중' },
+    { origin: 'Saudi/Total Jubail Refinery', port: 'Jubail', note: '' },
+  ],
+  'Bahrain': [
+    { origin: 'BAPCO', port: 'B220', note: '' },
+    { origin: 'BAPCO', port: 'B210', note: 'Drone attack : Tank Area 영향 (사전 예방 조치로 CDU S/D)' },
+  ],
+  'Qatar': [
+    { origin: 'Mesaieed', port: 'NGL', note: 'Drone attack : 생산 중단' },
+    { origin: 'Ras LaffanⅠ', port: 'FRN', note: 'Tank 제약에 따른 FM' },
+    { origin: 'Ras LaffanⅡ', port: 'FRN', note: 'Tank 제약에 따른 FM' },
+    { origin: 'Ras LaffanⅡ', port: 'PC', note: 'Drone attack : 생산 중단' },
+    { origin: 'Ras LaffanⅡ', port: 'GTL', note: 'Drone attack : 생산 중단' },
+    { origin: 'Pearl GTL', port: 'GTL', note: 'Tank 제약에 따른 FM' },
+  ],
+  'UAE': [
+    { origin: 'GASCO', port: 'Ruwais', note: 'Tank 제약에 따른 ADNOC Trading FM 준비 중' },
+    { origin: 'Umm Al Nar Refinery', port: 'Ruwais', note: 'Tank 제약에 따른 ADNOC Trading FM 준비 중' },
+    { origin: 'Condensate Splitter', port: 'Ruwais', note: 'Tank 제약으로 가동율 조정(△20%)' },
+    { origin: 'Ruwais New Refinery', port: 'Ruwais', note: 'Drone Attack : S/D (FCC 내 프로필렌 Tank 손실)' },
+    { origin: 'Jebel Ali Splitter', port: 'Jebel Ali', note: 'Tank 제약으로 가동율 조정(△20%)' },
+  ],
+  'IRAQ': [
+    { origin: 'Somo', port: '', note: '' },
+    { origin: 'Basrah', port: '', note: '' },
+    { origin: 'Kurdish', port: '', note: '' },
+    { origin: 'Unusual Seller', port: '', note: 'Vitol Splitter 가동정지' },
+  ],
+  'Oman': [
+    { origin: '', port: 'Duqm', note: '오만항 Drone Attack 이후 임시 Close → 현재 운영중' },
+  ],
+  'Egypt': [
+    { origin: '', port: 'Suez', note: '' },
+  ]
 };
 
 export function Dashboard() {
@@ -153,6 +199,8 @@ export function Dashboard() {
   const [activeNote, setActiveNote] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hiddenLines, setHiddenLines] = useState<Record<string, boolean>>({});
+  const [showNaphthaHelp, setShowNaphthaHelp] = useState(false);
+  const [hoveredCountry, setHoveredCountry] = useState<{ show: boolean, country: string, x: number, y: number }>({ show: false, country: '', x: 0, y: 0 });
 
   const handleLegendClick = (e: any) => {
     setHiddenLines(prev => ({ ...prev, [e.dataKey]: !prev[e.dataKey] }));
@@ -420,6 +468,9 @@ export function Dashboard() {
                 <button onClick={() => scrollToSection('naphtha')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
                   <Factory size={14} className="text-purple-500" /> 납사(MOPJ)
                 </button>
+                <button onClick={() => scrollToSection('naphtha-damage')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                  <AlertTriangle size={14} className="text-rose-500" /> 중동 납사 피해현황
+                </button>
                 <button onClick={() => scrollToSection('ethylene')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
                   <Activity size={14} className="text-amber-500" /> 에틸렌(CFR NEA)
                 </button>
@@ -621,74 +672,166 @@ export function Dashboard() {
                 <LineChart data={filteredData.naturalGas} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                  <YAxis yAxisId="left" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                  <YAxis yAxisId="right" orientation="right" stroke="#f97316" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={hiddenLines['US']} type="monotone" dataKey="US" name="미국" stroke="#f97316" strokeWidth={2} dot={false} />
-                  <Line hide={hiddenLines['Asia']} type="monotone" dataKey="Asia" name="아시아" stroke="#10b981" strokeWidth={2} dot={false} />
-                  <Line hide={hiddenLines['Europe']} type="monotone" dataKey="Europe" name="유럽" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Line hide={hiddenLines['US']} yAxisId="right" type="monotone" dataKey="US" name="미국(우)" stroke="#f97316" strokeWidth={2} dot={false} />
+                  <Line hide={hiddenLines['Asia']} yAxisId="left" type="monotone" dataKey="Asia" name="아시아" stroke="#10b981" strokeWidth={2} dot={false} />
+                  <Line hide={hiddenLines['Europe']} yAxisId="left" type="monotone" dataKey="Europe" name="유럽" stroke="#3b82f6" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
 
-        {/* Naphtha Spot */}
-        <Card id="naphtha" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24]">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500">
-                <Factory size={16} />
+        {/* Naphtha Column */}
+        <div className="flex flex-col gap-6">
+          {/* Naphtha Spot */}
+          <Card id="naphtha" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24]">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500">
+                  <Factory size={16} />
+                </div>
+                <p className="text-sm text-gray-400 font-medium">납사(MOPJ) <span className="text-gray-500 text-xs ml-1">[단위: $/톤]</span></p>
               </div>
-              <p className="text-sm text-gray-400 font-medium">납사(MOPJ) <span className="text-gray-500 text-xs ml-1">[단위: $/톤]</span></p>
-            </div>
-            
-            <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start">
-              <div className="flex flex-col gap-1 w-full">
-                <div className="flex justify-between w-full items-center mb-1">
-                  <p className="text-[10px] text-gray-500 font-medium tracking-wider">납사</p>
-                  <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestNaphtha.date)}</p>
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestNaphtha.Naphtha, 2)}</span>
-                  <span className={`text-sm font-medium ${naphthaChange.color}`}>({naphthaChange.diffText})</span>
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-xs text-gray-400">전일: ${formatNumber(prevNaphtha.Naphtha, 2)}</span>
-                  <span className={`text-[10px] font-medium ${naphthaChange.color}`}>({naphthaChange.pctText})</span>
+              
+              <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start">
+                <div className="flex flex-col gap-1 w-full">
+                  <div className="flex justify-between w-full items-center mb-1">
+                    <p className="text-[10px] text-gray-500 font-medium tracking-wider">납사</p>
+                    <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestNaphtha.date)}</p>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestNaphtha.Naphtha, 2)}</span>
+                    <span className={`text-sm font-medium ${naphthaChange.color}`}>({naphthaChange.diffText})</span>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xs text-gray-400">전일: ${formatNumber(prevNaphtha.Naphtha, 2)}</span>
+                    <span className={`text-[10px] font-medium ${naphthaChange.color}`}>({naphthaChange.pctText})</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex justify-end mb-2">
-              <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
-                {['1w', '1m', '6m', '1y'].map((range) => (
-                  <button
-                    key={range}
-                    onClick={() => setNaphthaTimeRange(range)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                      naphthaTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
-                    }`}
+              <div className="flex justify-end mb-2">
+                <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35]">
+                  {['1w', '1m', '6m', '1y'].map((range) => (
+                    <button
+                      key={range}
+                      onClick={() => setNaphthaTimeRange(range)}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                        naphthaTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {range === '1w' ? '1주' : range === '1m' ? '1개월' : range === '6m' ? '6개월' : '1년'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="h-48 w-full mt-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={filteredData.naphtha} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
+                    <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
+                    <Line hide={hiddenLines['Naphtha']} type="monotone" dataKey="Naphtha" stroke="#a855f7" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Middle East Naphtha Damage Status */}
+          <Card id="naphtha-damage" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24] flex-grow relative">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500">
+                    <AlertTriangle size={16} />
+                  </div>
+                  <p className="text-sm text-gray-400 font-medium">중동 납사 피해현황</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">[26.03.12 기준]</span>
+                  <div 
+                    className="relative flex items-center justify-center text-gray-400 hover:text-white cursor-help"
+                    onMouseEnter={() => setShowNaphthaHelp(true)}
+                    onMouseLeave={() => setShowNaphthaHelp(false)}
+                    onTouchStart={() => setShowNaphthaHelp(true)}
+                    onTouchEnd={() => setShowNaphthaHelp(false)}
                   >
-                    {range === '1w' ? '1주' : range === '1m' ? '1개월' : range === '6m' ? '6개월' : '1년'}
-                  </button>
-                ))}
+                    <HelpCircle size={14} />
+                    {showNaphthaHelp && (
+                      <div className="absolute right-0 top-6 w-64 p-3 bg-[#2A2A35] border border-gray-600 rounded-lg shadow-xl z-50 text-xs text-gray-200 whitespace-pre-line">
+                        ①Tank 제약: Tank 제약 경우 호르무즈 Open 정상화 가능{"\n"}
+                        ② Drone Attack 영향
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="h-48 w-full mt-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={filteredData.naphtha} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
-                  <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={hiddenLines['Naphtha']} type="monotone" dataKey="Naphtha" stroke="#a855f7" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="overflow-x-auto">
+                <table className="w-full text-[11px] text-left text-gray-300">
+                  <thead className="text-[10px] text-gray-400 bg-[#1C1C24] border-b border-[#2A2A35]">
+                    <tr>
+                      <th className="px-2 py-2 font-medium">Country</th>
+                      <th className="px-2 py-2 font-medium text-right">기존판매량</th>
+                      <th className="px-2 py-2 font-medium text-right">Tank제약</th>
+                      <th className="px-2 py-2 font-medium text-right">Drone피해</th>
+                      <th className="px-2 py-2 font-medium text-right">피해비중</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { country: 'Kuwait', existing: 666, tank: 166, drone: 0 },
+                      { country: 'Saudi', existing: 548, tank: 0, drone: 150 },
+                      { country: 'Bahrain', existing: 215, tank: 15, drone: 100 },
+                      { country: 'Qatar', existing: 833, tank: 500, drone: 275 },
+                      { country: 'UAE', existing: 1189, tank: 94, drone: 417 },
+                      { country: 'IRAQ', existing: 390, tank: 100, drone: 0 },
+                      { country: 'Oman', existing: 200, tank: 0, drone: 0 },
+                      { country: 'Egypt', existing: 100, tank: 0, drone: 0 },
+                    ].map((row, idx) => {
+                      const ratio = ((row.tank + row.drone) / row.existing) * 100;
+                      return (
+                        <tr 
+                          key={idx} 
+                          className="border-b border-[#2A2A35] hover:bg-[#2A2A35]/50 transition-colors cursor-pointer"
+                          onMouseEnter={(e) => setHoveredCountry({ show: true, country: row.country, x: e.clientX, y: e.clientY })}
+                          onMouseMove={(e) => setHoveredCountry(prev => ({ ...prev, x: e.clientX, y: e.clientY }))}
+                          onMouseLeave={() => setHoveredCountry(prev => ({ ...prev, show: false }))}
+                          onTouchStart={(e) => setHoveredCountry({ show: true, country: row.country, x: e.touches[0].clientX, y: e.touches[0].clientY })}
+                          onTouchEnd={() => setHoveredCountry(prev => ({ ...prev, show: false }))}
+                        >
+                          <td className="px-2 py-2 font-medium text-white">{row.country}</td>
+                          <td className="px-2 py-2 text-right">{row.existing.toLocaleString()}</td>
+                          <td className="px-2 py-2 text-right text-amber-500">{row.tank > 0 ? row.tank.toLocaleString() : '-'}</td>
+                          <td className="px-2 py-2 text-right text-rose-500">{row.drone > 0 ? row.drone.toLocaleString() : '-'}</td>
+                          <td className="px-2 py-2 text-right font-bold text-white">
+                            {ratio > 0 ? `${ratio.toFixed(1)}%` : '-'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    <tr className="bg-[#1C1C24] font-bold border-t-2 border-[#2A2A35]">
+                      <td className="px-2 py-2 text-white">Total</td>
+                      <td className="px-2 py-2 text-right text-white">4,141</td>
+                      <td className="px-2 py-2 text-right text-amber-500">875</td>
+                      <td className="px-2 py-2 text-right text-rose-500">942</td>
+                      <td className="px-2 py-2 text-right text-white">43.9%</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-2 text-right text-[10px] text-gray-500">
+                * 단위: 천톤
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Ethylene Spot */}
         <Card id="ethylene" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24]">
@@ -1152,6 +1295,38 @@ export function Dashboard() {
         </Card>
       </div>
       </div>
+      {/* Country Details Tooltip */}
+      {hoveredCountry.show && naphthaDetails[hoveredCountry.country] && (
+        <div 
+          className="fixed z-50 bg-[#1C1C24] border border-[#2A2A35] rounded-lg shadow-2xl p-3 pointer-events-none"
+          style={{ 
+            left: Math.min(hoveredCountry.x + 15, window.innerWidth - 300), 
+            top: hoveredCountry.y + 15,
+            minWidth: '250px',
+            maxWidth: '400px'
+          }}
+        >
+          <p className="text-white font-bold text-xs mb-2">{hoveredCountry.country} 상세 현황</p>
+          <table className="w-full text-[10px] text-left text-gray-300">
+            <thead className="bg-[#2A2A35] text-gray-400">
+              <tr>
+                <th className="px-2 py-1">Origin</th>
+                <th className="px-2 py-1">Port</th>
+                <th className="px-2 py-1">비고</th>
+              </tr>
+            </thead>
+            <tbody>
+              {naphthaDetails[hoveredCountry.country].map((detail, i) => (
+                <tr key={i} className="border-b border-[#2A2A35] last:border-0">
+                  <td className="px-2 py-1">{detail.origin || '-'}</td>
+                  <td className="px-2 py-1">{detail.port || '-'}</td>
+                  <td className="px-2 py-1 text-amber-400/90">{detail.note || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
