@@ -642,15 +642,15 @@ export function Dashboard() {
             </div>
             <div className="h-48 w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={filteredData.oil} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <LineChart data={filteredData.oil} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={hiddenLines['WTI']} type="monotone" dataKey="WTI" stroke="#f97316" strokeWidth={2} dot={false} />
-                  <Line hide={hiddenLines['Brent']} type="monotone" dataKey="Brent" stroke="#10b981" strokeWidth={2} dot={false} />
-                  <Line hide={hiddenLines['Dubai']} type="monotone" dataKey="Dubai" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Line hide={!!hiddenLines['WTI']} type="monotone" dataKey="WTI" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['Brent']} type="monotone" dataKey="Brent" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['Dubai']} type="monotone" dataKey="Dubai" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -735,16 +735,16 @@ export function Dashboard() {
             </div>
             <div className="h-48 w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={filteredData.naturalGas} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <LineChart data={filteredData.naturalGas} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis yAxisId="left" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <YAxis yAxisId="right" orientation="right" stroke="#f97316" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={hiddenLines['US']} yAxisId="right" type="monotone" dataKey="US" name="미국(우)" stroke="#f97316" strokeWidth={2} dot={false} />
-                  <Line hide={hiddenLines['Asia']} yAxisId="left" type="monotone" dataKey="Asia" name="아시아" stroke="#10b981" strokeWidth={2} dot={false} />
-                  <Line hide={hiddenLines['Europe']} yAxisId="left" type="monotone" dataKey="Europe" name="유럽" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Line hide={!!hiddenLines['US']} yAxisId="right" type="monotone" dataKey="US" name="미국(우)" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['Asia']} yAxisId="left" type="monotone" dataKey="Asia" name="아시아" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['Europe']} yAxisId="left" type="monotone" dataKey="Europe" name="유럽" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -797,13 +797,13 @@ export function Dashboard() {
               </div>
               <div className="h-48 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={filteredData.naphtha} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                  <LineChart data={filteredData.naphtha} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                     <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                     <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                    <Line hide={hiddenLines['Naphtha']} type="monotone" dataKey="Naphtha" stroke="#a855f7" strokeWidth={2} dot={false} />
+                    <Line hide={!!hiddenLines['Naphtha']} type="monotone" dataKey="Naphtha" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -1002,15 +1002,15 @@ export function Dashboard() {
             </div>
             <div className="h-48 w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={filteredData.ethylene} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <LineChart data={filteredData.ethylene} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis yAxisId="left" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <YAxis yAxisId="right" orientation="right" stroke="#ffffff" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={hiddenLines['Ethylene']} yAxisId="left" type="monotone" dataKey="Ethylene" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} />
-                  <Line hide={hiddenLines['Spread']} yAxisId="right" type="monotone" dataKey="Spread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} />
+                  <Line hide={!!hiddenLines['Ethylene']} yAxisId="left" type="monotone" dataKey="Ethylene" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['Spread']} yAxisId="right" type="monotone" dataKey="Spread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1067,15 +1067,15 @@ export function Dashboard() {
             </div>
             <div className="h-48 w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={filteredData.propylene} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <LineChart data={filteredData.propylene} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis yAxisId="left" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <YAxis yAxisId="right" orientation="right" stroke="#ffffff" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={hiddenLines['Propylene']} yAxisId="left" type="monotone" dataKey="Propylene" stroke="#06b6d4" strokeWidth={2} dot={false} connectNulls={true} />
-                  <Line hide={hiddenLines['PropyleneSpread']} yAxisId="right" type="monotone" dataKey="PropyleneSpread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} />
+                  <Line hide={!!hiddenLines['Propylene']} yAxisId="left" type="monotone" dataKey="Propylene" stroke="#06b6d4" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['PropyleneSpread']} yAxisId="right" type="monotone" dataKey="PropyleneSpread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1132,24 +1132,23 @@ export function Dashboard() {
             </div>
             <div className="h-48 w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={filteredData.butadiene} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <LineChart data={filteredData.butadiene} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis yAxisId="left" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <YAxis yAxisId="right" orientation="right" stroke="#ffffff" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={hiddenLines['Butadiene']} yAxisId="left" type="monotone" dataKey="Butadiene" stroke="#ec4899" strokeWidth={2} dot={false} connectNulls={true} />
-                  <Line hide={hiddenLines['ButadieneSpread']} yAxisId="right" type="monotone" dataKey="ButadieneSpread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} />
+                  <Line hide={!!hiddenLines['Butadiene']} yAxisId="left" type="monotone" dataKey="Butadiene" stroke="#ec4899" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['ButadieneSpread']} yAxisId="right" type="monotone" dataKey="ButadieneSpread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      {/* Main Charts Area */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Charts Area */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* Freight Spot Chart */}
         <Card id="freight-spot" className="lg:col-span-3">
           <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -1212,27 +1211,27 @@ export function Dashboard() {
             <div className="flex flex-col gap-6 mt-4">
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={filteredData.freightSpot} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                  <LineChart data={filteredData.freightSpot} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                     <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                     <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                    <Line hide={hiddenLines['Clean']} type="monotone" dataKey="Clean" name="Clean" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} />
-                    <Line hide={hiddenLines['Dirty']} type="monotone" dataKey="Dirty" name="Dirty" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} />
-                    <Line hide={hiddenLines['BDI']} type="monotone" dataKey="BDI" name="BDI" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} />
+                    <Line hide={!!hiddenLines['Clean']} type="monotone" dataKey="Clean" name="Clean" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                    <Line hide={!!hiddenLines['Dirty']} type="monotone" dataKey="Dirty" name="Dirty" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                    <Line hide={!!hiddenLines['BDI']} type="monotone" dataKey="BDI" name="BDI" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={filteredData.freightSpot} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                  <LineChart data={filteredData.freightSpot} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                     <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                     <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                    <Line hide={hiddenLines['SCFI']} type="monotone" dataKey="SCFI" name="SCFI" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} />
+                    <Line hide={!!hiddenLines['SCFI']} type="monotone" dataKey="SCFI" name="SCFI" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -1301,7 +1300,7 @@ export function Dashboard() {
             </div>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={freightChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <LineChart data={freightChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                   <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
@@ -1314,7 +1313,7 @@ export function Dashboard() {
                     const color = isLatest ? '#3b82f6' : isPrev ? '#10b981' : `rgba(107, 114, 128, ${opacity})`;
                     return (
                       <Line 
-                        hide={hiddenLines[date]}
+                        hide={!!hiddenLines[date]}
                         key={date} 
                         type="monotone" 
                         dataKey={date} 
@@ -1323,6 +1322,8 @@ export function Dashboard() {
                         dot={isLatest || isPrev} 
                         activeDot={{ r: 4 }}
                         name={date}
+                        connectNulls={true}
+                        isAnimationActive={false}
                       />
                     );
                   })}
@@ -1331,25 +1332,23 @@ export function Dashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
 
-      {/* Status Tables */}
-      <div className="grid grid-cols-1 gap-6">
-      </div>
-
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* Force Majeure */}
         <Card id="force-majeure" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24] lg:col-span-1">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg flex items-center gap-2">
                 <AlertTriangle className="text-rose-500" size={20} />
-                Force Majeure 현황
+                <div className="flex items-baseline gap-2">
+                  <span>Force Majeure 현황</span>
+                  {fmBaseDate && (
+                    <span className="text-[10px] sm:text-xs text-gray-500 font-normal whitespace-nowrap">[{fmBaseDate} 기준]</span>
+                  )}
+                </div>
               </CardTitle>
               <div className="flex items-center gap-2">
-                {fmBaseDate && (
-                  <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">[{fmBaseDate} 기준]</span>
-                )}
                 <div className="relative">
                 <button 
                   onMouseEnter={() => setShowFMHelp(true)}
@@ -1530,7 +1529,7 @@ export function Dashboard() {
         </Card>
 
         {/* Exchange Rate Dashboard */}
-        <Card id="exchange-rate" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24] lg:col-span-3">
+        <Card id="exchange-rate" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24] mt-6 lg:col-span-3">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-6">
               <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center text-yellow-500">
@@ -1629,24 +1628,25 @@ export function Dashboard() {
               </div>
             </div>
 
-            <div className="h-[300px] sm:h-[400px] w-full">
+            <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={filteredData.exchangeRate} margin={{ top: 10, right: 30, left: -20, bottom: 0 }}>
+                <LineChart data={filteredData.exchangeRate} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis yAxisId="left" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <YAxis yAxisId="right" orientation="right" stroke="#a855f7" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '11px', paddingTop: '20px', cursor: 'pointer' }} />
-                  <Line hide={hiddenLines['USD']} yAxisId="left" type="monotone" dataKey="USD" name="미국(USD)" stroke="#3b82f6" strokeWidth={2} dot={false} />
-                  <Line hide={hiddenLines['JPY']} yAxisId="left" type="monotone" dataKey="JPY" name="일본(JPY/100)" stroke="#10b981" strokeWidth={2} dot={false} />
-                  <Line hide={hiddenLines['EUR']} yAxisId="left" type="monotone" dataKey="EUR" name="유럽연합(EUR)" stroke="#f97316" strokeWidth={2} dot={false} />
-                  <Line hide={hiddenLines['CNY']} yAxisId="right" type="monotone" dataKey="CNY" name="중국(CNY)(우)" stroke="#a855f7" strokeWidth={2} dot={false} />
+                  <Line hide={!!hiddenLines['USD']} yAxisId="left" type="monotone" dataKey="USD" name="미국(USD)" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['JPY']} yAxisId="left" type="monotone" dataKey="JPY" name="일본(JPY/100)" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['EUR']} yAxisId="left" type="monotone" dataKey="EUR" name="유럽연합(EUR)" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['CNY']} yAxisId="right" type="monotone" dataKey="CNY" name="중국(CNY)(우)" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
       {/* Country Details Tooltip */}

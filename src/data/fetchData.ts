@@ -124,8 +124,15 @@ export async function fetchDashboardData() {
     source: row[11]
   })).filter(row => row.company);
 
-  // Extract base date from N188 (Row 187, Col 13)
-  const fmBaseDate = forceMajeureRaw[187]?.[13] || '';
+  // Extract base date from N188 (Row 187, Col 13) or by searching for the label
+  let fmBaseDate = forceMajeureRaw[187]?.[13] || '';
+  if (!fmBaseDate) {
+    const baseDateRow = forceMajeureRaw.find(row => row.some(cell => cell && cell.includes('작성일기준')));
+    if (baseDateRow) {
+      const labelIdx = baseDateRow.findIndex(cell => cell && cell.includes('작성일기준'));
+      fmBaseDate = baseDateRow[labelIdx + 1] || '';
+    }
+  }
 
   // Parse Operating Rates
   // Format: [empty, 구분, Start, End, Country, Company, Commodity, Capa(만톤), 비고, 출처]
