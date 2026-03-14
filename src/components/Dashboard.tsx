@@ -146,7 +146,7 @@ const naphthaDetails: Record<string, { origin: string, port: string, existing?: 
     { origin: 'Yanbu Refinery', port: 'Yanbu', existing: 100, tank: 0, drone: 0, note: '사우디 West' },
     { origin: 'Rabigh Refinery', port: 'Rabigh', existing: 100, tank: 0, drone: 0, note: '사우디 West' },
     { origin: 'Jubail(Shell/Aramco)', port: 'Jubail', existing: 100, tank: 0, drone: 0, note: '' },
-    { origin: 'Ras Tanura Refinery', port: 'Ras Tanura', existing: 148, tank: 0, drone: 150, note: 'Drone attack : Main 설비 이상 없음, 현재 재가동 준비중' },
+    { origin: 'Ras Tanura Refinery', port: 'Ras Tanura', existing: 150, tank: 0, drone: 150, note: 'Drone attack : Main 설비 이상 없음, 현재 재가동 준비중' },
     { origin: 'Saudi/Total Jubail Refinery', port: 'Jubail', existing: 100, tank: 0, drone: 0, note: '' },
   ],
   'Bahrain': [
