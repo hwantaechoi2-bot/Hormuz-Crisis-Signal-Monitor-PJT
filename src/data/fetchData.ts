@@ -110,7 +110,10 @@ export async function fetchDashboardData() {
   })).filter(row => row.date && !isNaN(row.price));
 
   // Parse Force Majeure
-  // Format: ['', '', '사업부', 'Commodity', 'Region', 'Country', 'Company', 'Capa(만톤)', 'Start', 'End', '비  고', '출처']
+  // Format: ['', '', '사업부', 'Commodity', 'Region', 'Country', 'Company', 'Capa(만톤)', 'Start', 'End', '비  고', '출처', '총 Capa(만톤)']
+  const fmHeader = forceMajeureRaw[1] || [];
+  const totalCapaIdx = fmHeader.findIndex(cell => cell && cell.includes('총 Capa'));
+  
   const forceMajeureData = forceMajeureRaw.slice(2).map(row => ({
     division: row[2],
     commodity: row[3],
@@ -118,21 +121,48 @@ export async function fetchDashboardData() {
     country: row[5],
     company: row[6],
     capacity: parseFloat(row[7]?.replace(/,/g, '')) || 0,
+    totalCapacity: totalCapaIdx !== -1 ? parseFloat(row[totalCapaIdx]?.replace(/,/g, '')) || 0 : 0,
     start: row[8],
     end: row[9],
     note: row[10],
     source: row[11]
-  })).filter(row => row.company);
+  })).filter(row => row.company || row.division === 'Total');
 
-  // Extract base date from N188 (Row 187, Col 13) or by searching for the label
-  let fmBaseDate = forceMajeureRaw[187]?.[13] || '';
+  // Create a map for total capacities by commodity and region
+  const fmTotalCapacities: Record<string, Record<string, number>> = {};
+  forceMajeureData.forEach(row => {
+    if (row.division === 'Total' && (row.region === 'Asia' || row.region === 'Global')) {
+      if (!fmTotalCapacities[row.commodity]) fmTotalCapacities[row.commodity] = {};
+      fmTotalCapacities[row.commodity][row.region] = row.totalCapacity || row.capacity;
+    }
+  });
+
+  // Filter out the "Total" rows from the main data to keep details clean
+  const fmDetails = forceMajeureData.filter(row => row.company && row.division !== 'Total');
+
+  // Extract base date
+  let fmBaseDate = '';
+  // Try specific cell first (N188)
+  const specificCell = forceMajeureRaw[187]?.[13];
+  if (specificCell && (specificCell.includes('.') || specificCell.includes('-'))) {
+    fmBaseDate = specificCell;
+  }
+
   if (!fmBaseDate) {
-    const baseDateRow = forceMajeureRaw.find(row => row.some(cell => cell && cell.includes('작성일기준')));
+    // Search for keywords like "작성일", "기준", "Update"
+    const baseDateRow = forceMajeureRaw.find(row => 
+      row.some(cell => cell && typeof cell === 'string' && (cell.includes('작성일') || cell.includes('기준일') || cell.includes('Update')))
+    );
     if (baseDateRow) {
-      const labelIdx = baseDateRow.findIndex(cell => cell && cell.includes('작성일기준'));
-      fmBaseDate = baseDateRow[labelIdx + 1] || '';
+      const cellWithDate = baseDateRow.find(cell => cell && typeof cell === 'string' && (cell.includes('.') || cell.includes('-')) && /\d/.test(cell));
+      if (cellWithDate) {
+        fmBaseDate = cellWithDate.replace(/작성일|기준일|기준|:|\[|\]/g, '').trim();
+      }
     }
   }
+  
+  // Final fallback for display if still empty (based on user request)
+  if (!fmBaseDate) fmBaseDate = '26.03.13';
 
   // Parse Operating Rates
   // Format: [empty, 구분, Start, End, Country, Company, Commodity, Capa(만톤), 비고, 출처]
@@ -179,7 +209,8 @@ export async function fetchDashboardData() {
     freightData,
     freightSpotData,
     freightContainerData,
-    forceMajeureData,
+    forceMajeureData: fmDetails,
+    fmTotalCapacities,
     fmBaseDate,
     operatingRatesData,
     turnaroundData,

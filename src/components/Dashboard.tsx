@@ -322,6 +322,7 @@ export function Dashboard() {
         freightSpot: processedFreightSpot,
         exchangeRate: processedExchangeRate,
         forceMajeure: res.forceMajeureData,
+        fmTotalCapacities: res.fmTotalCapacities,
         fmBaseDate: res.fmBaseDate,
         operatingRates: res.operatingRatesData,
         turnaround: res.turnaroundData
@@ -345,11 +346,13 @@ export function Dashboard() {
         .reduce((sum: number, item: any) => sum + item.capacity, 0);
       
       const division = commData[0]?.division || '';
+      const totalCapacities = (data.fmTotalCapacities as any)?.[comm as string] || {};
       
       result.push({
         commodity: comm,
         region: 'Global',
         capacity: globalCapa,
+        totalCapacity: totalCapacities['Global'] || 0,
         division,
         details: commData
       });
@@ -358,13 +361,14 @@ export function Dashboard() {
         commodity: comm,
         region: 'Asia',
         capacity: asiaCapa,
+        totalCapacity: totalCapacities['Asia'] || 0,
         division,
         details: commData.filter((item: any) => item.region === 'Asia')
       });
     });
     
     return result;
-  }, [data?.forceMajeure]);
+  }, [data?.forceMajeure, data?.fmTotalCapacities]);
 
   const filteredData = useMemo(() => {
     if (!data) return null;
@@ -1341,10 +1345,12 @@ export function Dashboard() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg flex items-center gap-2">
                 <AlertTriangle className="text-rose-500" size={20} />
-                <div className="flex items-baseline gap-2">
-                  <span>Force Majeure 현황</span>
+                <div className="flex flex-col">
+                  <span className="leading-tight">Force Majeure 현황</span>
                   {fmBaseDate && (
-                    <span className="text-[10px] sm:text-xs text-gray-500 font-normal whitespace-nowrap">[{fmBaseDate} 기준]</span>
+                    <span className="text-[10px] text-gray-400 font-medium mt-0.5">
+                      {fmBaseDate.includes('기준') ? fmBaseDate : `[${fmBaseDate} 기준]`}
+                    </span>
                   )}
                 </div>
               </CardTitle>
@@ -1388,14 +1394,19 @@ export function Dashboard() {
             </div>
           </div>
         </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
+            <div className="flex justify-end mb-1">
+              <span className="text-[9px] text-gray-500">[단위: 만톤]</span>
+            </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-[11px] text-left text-gray-300">
-                <thead className="text-[10px] text-gray-400 bg-[#1C1C24] border-b border-[#2A2A35]">
+              <table className="w-full text-[10px] sm:text-[11px] text-left text-gray-300">
+                <thead className="text-[9px] sm:text-[10px] text-gray-400 bg-[#1C1C24] border-b border-[#2A2A35]">
                   <tr>
-                    <th className="px-3 py-2 font-medium">Commodity</th>
-                    <th className="px-3 py-2 font-medium">Region</th>
-                    <th className="px-3 py-2 font-medium text-right">Capa(만톤)</th>
+                    <th className="px-2 py-2 font-medium">Commodity</th>
+                    <th className="px-2 py-2 font-medium">Region</th>
+                    <th className="px-2 py-2 font-medium text-right">F/M Capa</th>
+                    <th className="px-2 py-2 font-medium text-right">총 Capa</th>
+                    <th className="px-2 py-2 font-medium text-right">비중</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1419,20 +1430,26 @@ export function Dashboard() {
                             );
                           }}
                         >
-                          <td className="px-3 py-3 font-medium text-white">
-                            <div className="flex items-center gap-2">
-                              <div className={`w-2 h-2 rounded-full ${dotColor}`} />
+                          <td className="px-2 py-2.5 font-medium text-white">
+                            <div className="flex items-center gap-1.5">
+                              <div className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
                               {row.commodity}
                             </div>
                           </td>
-                          <td className="px-3 py-3 text-gray-400">{row.region}</td>
-                          <td className="px-3 py-3 text-right font-bold text-white">
+                          <td className="px-2 py-2.5 text-gray-400">{row.region}</td>
+                          <td className="px-2 py-2.5 text-right font-bold text-white">
                             {row.capacity > 0 ? formatNumber(row.capacity, 0) : '-'}
+                          </td>
+                          <td className="px-2 py-2.5 text-right font-bold text-gray-400">
+                            {row.totalCapacity > 0 ? formatNumber(row.totalCapacity, 0) : '-'}
+                          </td>
+                          <td className="px-2 py-2.5 text-right font-bold text-emerald-400">
+                            {row.totalCapacity > 0 ? `${formatNumber((row.capacity / row.totalCapacity) * 100, 1)}%` : '-'}
                           </td>
                         </tr>
                         {isExpanded && (
                           <tr>
-                            <td colSpan={3} className="px-0 py-0">
+                            <td colSpan={5} className="px-0 py-0">
                               <div 
                                 className="bg-[#1C1C24] p-3 border-b border-[#2A2A35] cursor-pointer"
                                 onClick={() => {
