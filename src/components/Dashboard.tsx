@@ -1443,7 +1443,7 @@ export function Dashboard() {
                           <td className="px-2 py-2.5 text-right font-bold text-gray-400">
                             {row.totalCapacity > 0 ? formatNumber(row.totalCapacity, 0) : '-'}
                           </td>
-                          <td className="px-2 py-2.5 text-right font-bold text-emerald-400">
+                          <td className="px-2 py-2.5 text-right font-bold text-rose-500">
                             {row.totalCapacity > 0 ? `${formatNumber((row.capacity / row.totalCapacity) * 100, 1)}%` : '-'}
                           </td>
                         </tr>
