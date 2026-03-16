@@ -149,14 +149,24 @@ export async function fetchDashboardData() {
   }
 
   if (!fmBaseDate) {
-    // Search for keywords like "작성일", "기준", "Update"
+    // Search for keywords like "마지막 업데이트 날짜", "작성일", "기준", "Update"
     const baseDateRow = forceMajeureRaw.find(row => 
-      row.some(cell => cell && typeof cell === 'string' && (cell.includes('작성일') || cell.includes('기준일') || cell.includes('Update')))
+      row.some(cell => cell && typeof cell === 'string' && (cell.includes('마지막 업데이트 날짜') || cell.includes('작성일') || cell.includes('기준일') || cell.includes('Update')))
     );
+    
     if (baseDateRow) {
-      const cellWithDate = baseDateRow.find(cell => cell && typeof cell === 'string' && (cell.includes('.') || cell.includes('-')) && /\d/.test(cell));
-      if (cellWithDate) {
-        fmBaseDate = cellWithDate.replace(/작성일|기준일|기준|:|\[|\]/g, '').trim();
+      const labelIdx = baseDateRow.findIndex(cell => cell && typeof cell === 'string' && (cell.includes('마지막 업데이트 날짜') || cell.includes('작성일') || cell.includes('기준일') || cell.includes('Update')));
+      
+      // Try the cell to the right first
+      const nextCell = baseDateRow[labelIdx + 1];
+      if (nextCell && (String(nextCell).includes('.') || String(nextCell).includes('-')) && /\d/.test(String(nextCell))) {
+        fmBaseDate = String(nextCell).replace(/기준|:|\[|\]/g, '').trim();
+      } else {
+        // Fallback to searching the whole row for a date-like string
+        const cellWithDate = baseDateRow.find(cell => cell && typeof cell === 'string' && (cell.includes('.') || cell.includes('-')) && /\d/.test(cell));
+        if (cellWithDate) {
+          fmBaseDate = cellWithDate.replace(/마지막 업데이트 날짜|작성일|기준일|기준|:|\[|\]/g, '').trim();
+        }
       }
     }
   }
