@@ -499,6 +499,8 @@ export function Dashboard() {
   const taOngoing = filteredData?.turnaround.filter((item: any) => item.category?.includes('진행 中')) || [];
   const taPlanned = filteredData?.turnaround.filter((item: any) => item.category?.includes('조기 실시')) || [];
 
+  const scfiDataCount = filteredData.freightSpot.filter((d: any) => d.SCFI !== undefined).length;
+
   return (
     <div className="pb-24">
       {/* Header */}
@@ -1189,7 +1191,7 @@ export function Dashboard() {
                         <span className={`text-sm font-medium ${change.color}`}>({change.diffText})</span>
                       </div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-xs text-gray-400">전일: {item.unit}{formatNumber(item.prev, item.decimals)}</span>
+                        <span className="text-xs text-gray-400">{item.label === 'SCFI' ? '전주' : '전일'}: {item.unit}{formatNumber(item.prev, item.decimals)}</span>
                         <span className={`text-[10px] font-medium ${change.color}`}>({change.pctText})</span>
                       </div>
                     </div>
@@ -1235,7 +1237,7 @@ export function Dashboard() {
                     <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                    <Line hide={!!hiddenLines['SCFI']} type="monotone" dataKey="SCFI" name="SCFI" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                    <Line hide={!!hiddenLines['SCFI']} type="monotone" dataKey="SCFI" name="SCFI" stroke="#a855f7" strokeWidth={2} dot={scfiDataCount === 1 ? { r: 4, fill: '#a855f7' } : false} connectNulls={true} isAnimationActive={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>

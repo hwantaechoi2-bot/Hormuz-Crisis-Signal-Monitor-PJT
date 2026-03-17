@@ -57,21 +57,21 @@ export async function fetchDashboardData() {
   const oilData = oilDataRaw.slice(2).map(row => ({
     date: row[1],
     name: row[2],
-    price: parseFloat(row[3])
+    price: parseFloat(row[3]?.replace(/,/g, ''))
   })).filter(row => row.date && !isNaN(row.price));
 
   // Parse Natural Gas (미국, 유럽, 아시아)
   const naturalGasData = naturalGasRaw.slice(2).map(row => ({
     date: row[1],
     name: row[2],
-    price: parseFloat(row[3])
+    price: parseFloat(row[3]?.replace(/,/g, ''))
   })).filter(row => row.date && !isNaN(row.price));
 
   // Parse Naphtha & Ethylene
   const neData = naphthaEthyleneRaw.slice(1).map(row => ({
     date: row[1],
     name: row[2],
-    price: parseFloat(row[3])
+    price: parseFloat(row[3]?.replace(/,/g, ''))
   })).filter(row => row.date && !isNaN(row.price));
 
   // Parse Propylene & Butadiene
@@ -79,12 +79,12 @@ export async function fetchDashboardData() {
     ...propyleneRaw.slice(1).map(row => ({
       date: row[1],
       name: row[2],
-      price: parseFloat(row[3])
+      price: parseFloat(row[3]?.replace(/,/g, ''))
     })).filter(row => row.date && !isNaN(row.price)),
     ...butadieneRaw.slice(1).map(row => ({
       date: row[1],
       name: row[2],
-      price: parseFloat(row[3])
+      price: parseFloat(row[3]?.replace(/,/g, ''))
     })).filter(row => row.date && !isNaN(row.price))
   ];
 
@@ -92,21 +92,21 @@ export async function fetchDashboardData() {
   const freightData = freightRaw.slice(2).map(row => ({
     date: row[1],
     name: row[2],
-    price: parseFloat(row[3])
+    price: parseFloat(row[3]?.replace(/,/g, ''))
   })).filter(row => row.date && !isNaN(row.price));
 
   // Parse Freight Spot
   const freightSpotData = freightSpotRaw.slice(2).map(row => ({
     date: row[1],
     name: row[2],
-    price: parseFloat(row[3])
+    price: parseFloat(row[3]?.replace(/,/g, ''))
   })).filter(row => row.date && !isNaN(row.price));
 
   // Parse Freight Container
   const freightContainerData = freightContainerRaw.slice(2).map(row => ({
     date: row[1],
     name: row[2],
-    price: parseFloat(row[3])
+    price: parseFloat(row[3]?.replace(/,/g, ''))
   })).filter(row => row.date && !isNaN(row.price));
 
   // Parse Force Majeure
@@ -203,12 +203,12 @@ export async function fetchDashboardData() {
 
   // Parse Exchange Rate
   // Format: [empty, 일자, 미국(USD), 중국(RMB), 일본(JPY/100), 유럽연합(EUR)]
-  const exchangeRateData = exchangeRateRaw.slice(1).map(row => ({
+  const exchangeRateData = exchangeRateRaw.slice(2).map(row => ({
     date: row[1],
-    USD: parseFloat(row[2]),
-    CNY: parseFloat(row[3]),
-    JPY: parseFloat(row[4]),
-    EUR: parseFloat(row[5])
+    USD: parseFloat(row[2]?.replace(/,/g, '')),
+    CNY: parseFloat(row[3]?.replace(/,/g, '')),
+    JPY: parseFloat(row[4]?.replace(/,/g, '')),
+    EUR: parseFloat(row[5]?.replace(/,/g, ''))
   })).filter(row => row.date && !isNaN(row.USD));
 
   return {
