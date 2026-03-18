@@ -654,9 +654,9 @@ export function Dashboard() {
                   <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={!!hiddenLines['WTI']} type="monotone" dataKey="WTI" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                  <Line hide={!!hiddenLines['Brent']} type="monotone" dataKey="Brent" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                  <Line hide={!!hiddenLines['Dubai']} type="monotone" dataKey="Dubai" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['WTI']} type="monotone" dataKey="WTI" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                  <Line hide={!!hiddenLines['Brent']} type="monotone" dataKey="Brent" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                  <Line hide={!!hiddenLines['Dubai']} type="monotone" dataKey="Dubai" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -748,9 +748,9 @@ export function Dashboard() {
                   <YAxis yAxisId="right" orientation="right" stroke="#f97316" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={!!hiddenLines['US']} yAxisId="right" type="monotone" dataKey="US" name="미국(우)" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                  <Line hide={!!hiddenLines['Asia']} yAxisId="left" type="monotone" dataKey="Asia" name="아시아" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                  <Line hide={!!hiddenLines['Europe']} yAxisId="left" type="monotone" dataKey="Europe" name="유럽" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['US']} yAxisId="right" type="monotone" dataKey="US" name="미국(우)" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                  <Line hide={!!hiddenLines['Asia']} yAxisId="left" type="monotone" dataKey="Asia" name="아시아" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                  <Line hide={!!hiddenLines['Europe']} yAxisId="left" type="monotone" dataKey="Europe" name="유럽" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -809,7 +809,7 @@ export function Dashboard() {
                     <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                    <Line hide={!!hiddenLines['Naphtha']} type="monotone" dataKey="Naphtha" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                    <Line hide={!!hiddenLines['Naphtha']} type="monotone" dataKey="Naphtha" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -1015,8 +1015,8 @@ export function Dashboard() {
                   <YAxis yAxisId="right" orientation="right" stroke="#ffffff" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={!!hiddenLines['Ethylene']} yAxisId="left" type="monotone" dataKey="Ethylene" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                  <Line hide={!!hiddenLines['Spread']} yAxisId="right" type="monotone" dataKey="Spread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['Ethylene']} yAxisId="left" type="monotone" dataKey="Ethylene" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                  <Line hide={!!hiddenLines['Spread']} yAxisId="right" type="monotone" dataKey="Spread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} isAnimationActive={true} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1080,8 +1080,8 @@ export function Dashboard() {
                   <YAxis yAxisId="right" orientation="right" stroke="#ffffff" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={!!hiddenLines['Propylene']} yAxisId="left" type="monotone" dataKey="Propylene" stroke="#06b6d4" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                  <Line hide={!!hiddenLines['PropyleneSpread']} yAxisId="right" type="monotone" dataKey="PropyleneSpread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['Propylene']} yAxisId="left" type="monotone" dataKey="Propylene" stroke="#06b6d4" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                  <Line hide={!!hiddenLines['PropyleneSpread']} yAxisId="right" type="monotone" dataKey="PropyleneSpread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} isAnimationActive={true} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1145,8 +1145,8 @@ export function Dashboard() {
                   <YAxis yAxisId="right" orientation="right" stroke="#ffffff" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                  <Line hide={!!hiddenLines['Butadiene']} yAxisId="left" type="monotone" dataKey="Butadiene" stroke="#ec4899" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                  <Line hide={!!hiddenLines['ButadieneSpread']} yAxisId="right" type="monotone" dataKey="ButadieneSpread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['Butadiene']} yAxisId="left" type="monotone" dataKey="Butadiene" stroke="#ec4899" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                  <Line hide={!!hiddenLines['ButadieneSpread']} yAxisId="right" type="monotone" dataKey="ButadieneSpread" name="Spread(우)" stroke="#ffffff" strokeWidth={2} strokeDasharray="4 4" dot={false} connectNulls={true} isAnimationActive={true} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1223,9 +1223,9 @@ export function Dashboard() {
                     <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                    <Line hide={!!hiddenLines['Clean']} type="monotone" dataKey="Clean" name="Clean" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                    <Line hide={!!hiddenLines['Dirty']} type="monotone" dataKey="Dirty" name="Dirty" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                    <Line hide={!!hiddenLines['BDI']} type="monotone" dataKey="BDI" name="BDI" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                    <Line hide={!!hiddenLines['Clean']} type="monotone" dataKey="Clean" name="Clean" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                    <Line hide={!!hiddenLines['Dirty']} type="monotone" dataKey="Dirty" name="Dirty" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                    <Line hide={!!hiddenLines['BDI']} type="monotone" dataKey="BDI" name="BDI" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -1237,7 +1237,7 @@ export function Dashboard() {
                     <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                    <Line hide={!!hiddenLines['SCFI']} type="monotone" dataKey="SCFI" name="SCFI" stroke="#a855f7" strokeWidth={2} dot={scfiDataCount === 1 ? { r: 4, fill: '#a855f7' } : false} connectNulls={true} isAnimationActive={false} />
+                    <Line hide={!!hiddenLines['SCFI']} type="monotone" dataKey="SCFI" name="SCFI" stroke="#a855f7" strokeWidth={2} dot={scfiDataCount === 1 ? { r: 4, fill: '#a855f7' } : false} connectNulls={true} isAnimationActive={true} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -1329,7 +1329,7 @@ export function Dashboard() {
                         activeDot={{ r: 4 }}
                         name={date}
                         connectNulls={true}
-                        isAnimationActive={false}
+                        isAnimationActive={true}
                       />
                     );
                   })}
@@ -1656,10 +1656,10 @@ export function Dashboard() {
                   <YAxis yAxisId="right" orientation="right" stroke="#a855f7" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '11px', paddingTop: '20px', cursor: 'pointer' }} />
-                  <Line hide={!!hiddenLines['USD']} yAxisId="left" type="monotone" dataKey="USD" name="미국(USD)" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                  <Line hide={!!hiddenLines['JPY']} yAxisId="left" type="monotone" dataKey="JPY" name="일본(JPY/100)" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                  <Line hide={!!hiddenLines['EUR']} yAxisId="left" type="monotone" dataKey="EUR" name="유럽연합(EUR)" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
-                  <Line hide={!!hiddenLines['CNY']} yAxisId="right" type="monotone" dataKey="CNY" name="중국(CNY)(우)" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={false} />
+                  <Line hide={!!hiddenLines['USD']} yAxisId="left" type="monotone" dataKey="USD" name="미국(USD)" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                  <Line hide={!!hiddenLines['JPY']} yAxisId="left" type="monotone" dataKey="JPY" name="일본(JPY/100)" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                  <Line hide={!!hiddenLines['EUR']} yAxisId="left" type="monotone" dataKey="EUR" name="유럽연합(EUR)" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                  <Line hide={!!hiddenLines['CNY']} yAxisId="right" type="monotone" dataKey="CNY" name="중국(CNY)(우)" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
