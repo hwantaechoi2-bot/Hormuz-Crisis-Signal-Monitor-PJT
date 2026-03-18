@@ -92,9 +92,9 @@ const filterFreightData = (dataList: any[], range: string) => {
   
   if (range === '1w') {
     return revList.slice(0, 7).reverse();
-  } else if (range === '6w') {
+  } else if (range === '1m') {
     let currentDate = new Date(revList[0].date);
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 4; i++) {
       const closest = revList.find(d => new Date(d.date) <= currentDate && !seenDates.has(d.date));
       if (closest) {
         result.push(closest);
@@ -106,6 +106,17 @@ const filterFreightData = (dataList: any[], range: string) => {
   } else if (range === '6m') {
     let currentDate = new Date(revList[0].date);
     for (let i = 0; i < 6; i++) {
+      const closest = revList.find(d => new Date(d.date) <= currentDate && !seenDates.has(d.date));
+      if (closest) {
+        result.push(closest);
+        seenDates.add(closest.date);
+      }
+      currentDate.setMonth(currentDate.getMonth() - 1);
+    }
+    return result.reverse();
+  } else if (range === '1y') {
+    let currentDate = new Date(revList[0].date);
+    for (let i = 0; i < 12; i++) {
       const closest = revList.find(d => new Date(d.date) <= currentDate && !seenDates.has(d.date));
       if (closest) {
         result.push(closest);
@@ -1291,7 +1302,7 @@ export function Dashboard() {
             </div>
             <div className="flex justify-end mb-2 overflow-x-auto no-scrollbar">
               <div className="flex items-center gap-1 bg-[#1C1C24] p-1 rounded-lg border border-[#2A2A35] flex-nowrap min-w-max">
-                {['1w', '6w', '6m'].map((range) => (
+                {['1w', '1m', '6m', '1y'].map((range) => (
                   <button
                     key={range}
                     onClick={() => setFreightTimeRange(range)}
@@ -1299,7 +1310,7 @@ export function Dashboard() {
                       freightTimeRange === range ? 'bg-[#2A2A35] text-white' : 'text-gray-400 hover:text-white'
                     }`}
                   >
-                    {range === '1w' ? '1주' : range === '6w' ? '6주' : '6개월'}
+                    {range === '1w' ? '1주' : range === '1m' ? '1개월' : range === '6m' ? '6개월' : '1년'}
                   </button>
                 ))}
               </div>
