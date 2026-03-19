@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/Card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Legend } from 'recharts';
 import { fetchDashboardData } from '../data/fetchData';
-import { TrendingUp, TrendingDown, AlertTriangle, Activity, Ship, Droplet, Factory, Settings, ChevronUp, ChevronDown, Info, Menu, X, Flame, HelpCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Activity, Ship, Droplet, Factory, Settings, ChevronUp, ChevronDown, Info, Menu, X, Flame, HelpCircle, Zap, RefreshCw } from 'lucide-react';
 
 const formatNumber = (num: number | undefined, decimals: number = 2) => {
   if (num === undefined || num === null) return '-';
@@ -217,6 +217,7 @@ export function Dashboard() {
   const [expandedFMRows, setExpandedFMRows] = useState<string[]>([]);
   const [expandedNaphthaRows, setExpandedNaphthaRows] = useState<string[]>([]);
   const [showFMHelp, setShowFMHelp] = useState(false);
+  const [showOilHelp, setShowOilHelp] = useState(false);
   const [showMoreFM, setShowMoreFM] = useState(false);
   const [fmBaseDate, setFmBaseDate] = useState('');
 
@@ -275,8 +276,10 @@ export function Dashboard() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    fetchDashboardData().then(res => {
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchDashboardData();
       // Process Oil Data
       const oilGrouped: any = {};
       res.oilData.forEach(row => {
@@ -368,11 +371,19 @@ export function Dashboard() {
         fmTotalCapacities: res.fmTotalCapacities,
         fmBaseDate: res.fmBaseDate,
         operatingRates: res.operatingRatesData,
-        turnaround: res.turnaroundData
+        turnaround: res.turnaroundData,
+        realtimePrice: res.realtimePrice
       });
       setFmBaseDate(res.fmBaseDate);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
       setLoading(false);
-    });
+    }
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
 
   const fmAggregated = useMemo(() => {
@@ -516,6 +527,8 @@ export function Dashboard() {
   const latestEUR = revExchangeRate.find(d => d.EUR !== undefined) || {};
   const prevEUR = revExchangeRate.find(d => d.EUR !== undefined && d.date !== latestEUR.date) || {};
 
+  const realtimePrice = data?.realtimePrice || { WTI: 0, Brent: 0, Dubai: 0, updateTime: '' };
+
   const wtiChange = calculateChange(latestWTI.WTI, prevWTI.WTI);
   const brentChange = calculateChange(latestBrent.Brent, prevBrent.Brent);
   const dubaiChange = calculateChange(latestDubai.Dubai, prevDubai.Dubai);
@@ -655,8 +668,81 @@ export function Dashboard() {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-6">
         {/* Top Indicators */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {/* Oil Futures */}
-        <Card id="crude-oil" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24]">
+          {/* Real-time Crude Oil Prices */}
+          <Card id="realtime-crude-oil" className="bg-gradient-to-br from-[#1A1A24] to-[#252535] border-blue-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 animate-pulse">
+                    <span className="text-[10px] text-red-500 font-black tracking-tighter uppercase">Live</span>
+                  </div>
+                  <p className="text-sm text-gray-300 font-bold tracking-tight">실시간 유가</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => setShowOilHelp(!showOilHelp)}
+                    className={`p-1.5 rounded-lg border transition-colors ${showOilHelp ? 'bg-blue-500/20 border-blue-500/40 text-blue-300' : 'bg-gray-500/10 border-gray-500/20 text-gray-400 hover:bg-gray-500/20'}`}
+                    title="도움말"
+                  >
+                    <HelpCircle size={14} />
+                  </button>
+                  <button 
+                    onClick={loadData}
+                    className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                    title="새로고침"
+                  >
+                    <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+                  </button>
+                </div>
+              </div>
+
+              {showOilHelp && (
+                <div className="mb-4 p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div>
+                    <p className="text-[10px] text-blue-400 font-bold mb-0.5">1. WTI</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">CL, 뉴욕상업거래소, 서부텍사스산 원유 (26.05.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 WTI(Western Texas Intermediate) 선물의 최근월물 가격</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-blue-400 font-bold mb-0.5">2. BRENT</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">BRN, 유럽 ICE선물거래소, 브렌트유 (26.06.)<br/>ICE 선물거래소에서 거래되는 영국 브렌트유 선물의 최근월물 가격</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-blue-400 font-bold mb-0.5">3. DUBAI</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">DCB, 뉴욕상업거래소, 두바이유 (26.03.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 두바이 크루드 오일 선물의 최근월물 가격(두바이유는 현물거래임에 따라 실시간 가격 확인 제한)</p>
+                  </div>
+                </div>
+              )}
+              
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
+                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">WTI</p>
+                  <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.WTI, 2)}</span>
+                  <div className="mt-1 flex items-center gap-1">
+                    <div className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
+                    <span className="text-[8px] text-amber-500/80 font-medium">10분지연</span>
+                  </div>
+                </div>
+                <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
+                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Brent</p>
+                  <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Brent, 2)}</span>
+                  <div className="mt-1 flex items-center gap-1">
+                    <div className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
+                    <span className="text-[8px] text-amber-500/80 font-medium">10분지연</span>
+                  </div>
+                </div>
+                <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
+                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Dubai</p>
+                  <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Dubai, 2)}</span>
+                </div>
+              </div>
+              <div className="mt-3 flex justify-end">
+                <p className="text-[9px] text-gray-600 font-medium">[단위: $/bbl, 네이버증권 기준]</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Oil Futures */}
+          <Card id="crude-oil" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24]">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">

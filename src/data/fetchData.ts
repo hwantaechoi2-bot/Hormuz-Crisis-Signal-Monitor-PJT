@@ -14,7 +14,8 @@ const GIDS = {
   FORCE_MAJEURE: '454908556',
   OPERATING_RATES: '1209759407',
   TURNAROUND: '720422684',
-  EXCHANGE_RATE: '1275419118'
+  EXCHANGE_RATE: '1275419118',
+  REALTIME_PRICE: '1677894699'
 };
 
 async function fetchCsv(gid: string) {
@@ -36,7 +37,8 @@ export async function fetchDashboardData() {
     forceMajeureRaw,
     operatingRatesRaw,
     turnaroundRaw,
-    exchangeRateRaw
+    exchangeRateRaw,
+    realtimePriceRaw
   ] = await Promise.all([
     fetchCsv(GIDS.OIL),
     fetchCsv(GIDS.NATURAL_GAS),
@@ -49,8 +51,18 @@ export async function fetchDashboardData() {
     fetchCsv(GIDS.FORCE_MAJEURE),
     fetchCsv(GIDS.OPERATING_RATES),
     fetchCsv(GIDS.TURNAROUND),
-    fetchCsv(GIDS.EXCHANGE_RATE)
+    fetchCsv(GIDS.EXCHANGE_RATE),
+    fetchCsv(GIDS.REALTIME_PRICE)
   ]);
+
+  // Parse Real-time Prices
+  // WTI: B5 (row 4, col 1), Brent: D5 (row 4, col 3), Dubai: F5 (row 4, col 5)
+  const realtimePrice = {
+    WTI: parseFloat(realtimePriceRaw[4]?.[1]?.replace(/,/g, '')) || 0,
+    Brent: parseFloat(realtimePriceRaw[4]?.[3]?.replace(/,/g, '')) || 0,
+    Dubai: parseFloat(realtimePriceRaw[4]?.[5]?.replace(/,/g, '')) || 0,
+    updateTime: realtimePriceRaw[4]?.[0] || '' // Assuming A5 has some time info or similar
+  };
 
   // Parse Oil Futures (Dubai, WTI, Brent)
   // Format: [empty, 일자, 이름, 가격, 코드]
@@ -224,6 +236,7 @@ export async function fetchDashboardData() {
     fmBaseDate,
     operatingRatesData,
     turnaroundData,
-    exchangeRateData
+    exchangeRateData,
+    realtimePrice
   };
 }
