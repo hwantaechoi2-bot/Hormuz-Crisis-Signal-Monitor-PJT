@@ -624,6 +624,9 @@ export function Dashboard() {
               {isMenuOpen && (
                 <div className="absolute top-full right-0 mt-2 w-56 bg-[#1C1C24] border border-[#2A2A35] rounded-xl shadow-2xl overflow-hidden z-50">
                   <div className="py-2">
+                    <button onClick={() => scrollToSection('realtime-crude-oil')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <Zap size={14} className="text-blue-400" /> 실시간 유가
+                    </button>
                     <button onClick={() => scrollToSection('crude-oil')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
                       <Droplet size={14} className="text-blue-500" /> 원유 / CRUDE OIL
                     </button>
