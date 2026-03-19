@@ -45,25 +45,40 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 const calculateChange = (current: number, previous: number) => {
-  if (!current || !previous) return { diffText: '-', pctText: '-', color: 'text-white', diff: 0 };
-  const diff = current - previous;
-  const pct = (diff / previous) * 100;
+  if (current === undefined || previous === undefined || current === null || previous === null) 
+    return { diffText: '-', pctText: '-', color: 'text-white', diff: 0 };
   
-  let color = 'text-white';
-  let diffText = '-';
-  let pctText = '-';
+  const diff = current - previous;
+  const pct = previous !== 0 ? (diff / previous) * 100 : 0;
+  
+  const formattedDiff = formatNumber(diff, 2);
+  // Check if the formatted value is 0 or -0
+  const isZero = parseFloat(formattedDiff) === 0;
 
-  if (diff > 0) {
-    color = 'text-emerald-400';
-    diffText = `+${formatNumber(diff, 2)}`;
-    pctText = `+${formatNumber(pct, 2)}%`;
-  } else if (diff < 0) {
-    color = 'text-rose-400';
-    diffText = `${formatNumber(diff, 2)}`;
-    pctText = `${formatNumber(pct, 2)}%`;
+  if (isZero) {
+    return { 
+      diffText: formattedDiff, 
+      pctText: `${formatNumber(pct, 2)}%`, 
+      color: 'text-white', 
+      diff 
+    };
   }
 
-  return { diffText, pctText, color, diff };
+  if (diff > 0) {
+    return {
+      diffText: `+${formattedDiff}`,
+      pctText: `+${formatNumber(pct, 2)}%`,
+      color: 'text-emerald-400',
+      diff
+    };
+  } else {
+    return {
+      diffText: formattedDiff,
+      pctText: `${formatNumber(pct, 2)}%`,
+      color: 'text-rose-400',
+      diff
+    };
+  }
 };
 
 const filterDataByTimeRange = (dataList: any[], range: string) => {
@@ -552,6 +567,10 @@ export function Dashboard() {
   const jpyChange = calculateChange(latestJPY.JPY, prevJPY.JPY);
   const eurChange = calculateChange(latestEUR.EUR, prevEUR.EUR);
 
+  const realtimeWtiChange = calculateChange(realtimePrice.WTI, latestWTI.WTI);
+  const realtimeBrentChange = calculateChange(realtimePrice.Brent, latestBrent.Brent);
+  const realtimeDubaiChange = calculateChange(realtimePrice.Dubai, latestDubai.Dubai);
+
   const taOngoing = filteredData?.turnaround.filter((item: any) => item.category?.includes('진행 中')) || [];
   const taPlanned = filteredData?.turnaround.filter((item: any) => item.category?.includes('조기 실시')) || [];
 
@@ -720,6 +739,10 @@ export function Dashboard() {
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
                   <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">WTI</p>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.WTI, 2)}</span>
+                  <div className={`flex items-center gap-1.5 mt-1 ${realtimeWtiChange.color}`}>
+                    <span className="text-[10px] font-bold">{realtimeWtiChange.diffText}</span>
+                    <span className="text-[10px] font-medium opacity-80">({realtimeWtiChange.pctText})</span>
+                  </div>
                   <div className="mt-1 flex items-center gap-1">
                     <div className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
                     <span className="text-[8px] text-amber-500/80 font-medium">10분지연</span>
@@ -728,6 +751,10 @@ export function Dashboard() {
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
                   <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Brent</p>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Brent, 2)}</span>
+                  <div className={`flex items-center gap-1.5 mt-1 ${realtimeBrentChange.color}`}>
+                    <span className="text-[10px] font-bold">{realtimeBrentChange.diffText}</span>
+                    <span className="text-[10px] font-medium opacity-80">({realtimeBrentChange.pctText})</span>
+                  </div>
                   <div className="mt-1 flex items-center gap-1">
                     <div className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
                     <span className="text-[8px] text-amber-500/80 font-medium">10분지연</span>
@@ -736,6 +763,10 @@ export function Dashboard() {
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
                   <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Dubai</p>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Dubai, 2)}</span>
+                  <div className={`flex items-center gap-1.5 mt-1 ${realtimeDubaiChange.color}`}>
+                    <span className="text-[10px] font-bold">{realtimeDubaiChange.diffText}</span>
+                    <span className="text-[10px] font-medium opacity-80">({realtimeDubaiChange.pctText})</span>
+                  </div>
                 </div>
               </div>
               <div className="mt-3 flex justify-end">

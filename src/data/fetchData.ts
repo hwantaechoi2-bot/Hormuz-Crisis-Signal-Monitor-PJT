@@ -57,11 +57,14 @@ export async function fetchDashboardData() {
 
   // Parse Real-time Prices
   // WTI: B5 (row 4, col 1), Brent: D5 (row 4, col 3), Dubai: F5 (row 4, col 5)
+  // Search for the row that contains "실시간가격" to be more robust
+  const realtimeRow = realtimePriceRaw.find(row => row.some(cell => cell && typeof cell === 'string' && cell.includes('실시간가격')));
+  
   const realtimePrice = {
-    WTI: parseFloat(realtimePriceRaw[4]?.[1]?.replace(/,/g, '')) || 0,
-    Brent: parseFloat(realtimePriceRaw[4]?.[3]?.replace(/,/g, '')) || 0,
-    Dubai: parseFloat(realtimePriceRaw[4]?.[5]?.replace(/,/g, '')) || 0,
-    updateTime: realtimePriceRaw[4]?.[0] || '' // Assuming A5 has some time info or similar
+    WTI: realtimeRow ? parseFloat(realtimeRow[1]?.replace(/,/g, '')) || 0 : 0,
+    Brent: realtimeRow ? parseFloat(realtimeRow[3]?.replace(/,/g, '')) || 0 : 0,
+    Dubai: realtimeRow ? parseFloat(realtimeRow[5]?.replace(/,/g, '')) || 0 : 0,
+    updateTime: ''
   };
 
   // Parse Oil Futures (Dubai, WTI, Brent)
