@@ -569,22 +569,31 @@ export function Dashboard() {
               </button>
               
               {isHelpOpen && (
-                <div className="absolute top-full right-0 mt-2 w-72 sm:w-80 bg-[#1C1C24] border border-[#2A2A35] rounded-xl shadow-2xl p-4 z-[60] text-xs sm:text-sm text-gray-300 leading-relaxed">
-                  <div className="space-y-3">
+                <div className="absolute top-full right-0 mt-2 w-56 sm:w-64 bg-[#1C1C24] border border-[#2A2A35] rounded-xl shadow-2xl p-4 z-[60] text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  <div className="space-y-4">
                     <div>
-                      <p className="font-bold text-white mb-1 flex items-center gap-1.5">
+                      <p className="font-bold text-white mb-1.5 flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                         가격 지표
                       </p>
-                      <p className="pl-3">전일자 종가 기준 (매일 오전 업데이트)</p>
-                      <p className="pl-3 text-gray-500 mt-1 italic">예: WTI 26.03.18 → 해당 날짜(18일)의 최종 고시 가격</p>
+                      <div className="pl-3 space-y-1">
+                        <p>전일자 종가 기준</p>
+                        <p className="text-[10px] sm:text-xs text-gray-400">(매일 오전 업데이트)</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 mt-1 italic leading-tight">
+                          예: WTI 26.03.18<br/>
+                          → 18일 최종 고시 가격
+                        </p>
+                      </div>
                     </div>
-                    <div className="pt-3 border-t border-[#2A2A35]">
-                      <p className="font-bold text-white mb-1 flex items-center gap-1.5">
+                    <div className="pt-4 border-t border-[#2A2A35]">
+                      <p className="font-bold text-white mb-1.5 flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         현황 리스트
                       </p>
-                      <p className="pl-3">변동 사항 발생 시 수시 갱신 (항목별 업데이트 일자 별도 표기)</p>
+                      <div className="pl-3 space-y-1">
+                        <p>변동 발생 시 수시 갱신</p>
+                        <p className="text-[10px] sm:text-xs text-gray-400">(항목별 업데이트 일자 별도 표기)</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1044,24 +1053,24 @@ export function Dashboard() {
               <p className="text-sm text-gray-400 font-medium">에틸렌(CFR NEA) <span className="text-gray-500 text-xs ml-1">[단위: $/톤]</span></p>
             </div>
             
-            <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start">
-              <div className="flex flex-col gap-1 w-full">
+            <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start gap-2">
+              <div className="flex flex-col gap-1 flex-1">
                 <div className="flex justify-between w-full items-center mb-1">
                   <p className="text-[10px] text-gray-500 font-medium tracking-wider">에틸렌</p>
                   <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestEthylene.date)}</p>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestEthylene.Ethylene, 2)}</span>
-                  <span className={`text-sm font-medium ${ethyleneChange.color}`}>({ethyleneChange.diffText})</span>
+                  <span className="text-base sm:text-lg lg:text-xl font-bold text-white">${formatNumber(latestEthylene.Ethylene, 2)}</span>
+                  <span className={`text-xs sm:text-sm font-medium ${ethyleneChange.color}`}>({ethyleneChange.diffText})</span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xs text-gray-400">전일: ${formatNumber(prevEthylene.Ethylene, 2)}</span>
-                  <span className={`text-[10px] font-medium ${ethyleneChange.color}`}>({ethyleneChange.pctText})</span>
+                  <span className="text-[10px] sm:text-xs text-gray-400">전일: ${formatNumber(prevEthylene.Ethylene, 2)}</span>
+                  <span className={`text-[9px] sm:text-[10px] font-medium ${ethyleneChange.color}`}>({ethyleneChange.pctText})</span>
                 </div>
               </div>
-              <div className="text-right min-w-[100px]">
-                <p className="text-[10px] text-gray-500 font-medium mb-1">에틸렌 Spread</p>
-                <p className={`text-lg lg:text-xl font-bold ${latestSpread.Spread !== undefined && latestSpread.Spread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+              <div className="text-right min-w-[85px] sm:min-w-[100px]">
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium mb-1 whitespace-nowrap">에틸렌 Spread</p>
+                <p className={`text-base sm:text-lg lg:text-xl font-bold ${latestSpread.Spread !== undefined && latestSpread.Spread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                   ${formatNumber(latestSpread.Spread, 2)}
                 </p>
               </div>
@@ -1109,24 +1118,24 @@ export function Dashboard() {
               <p className="text-sm text-gray-400 font-medium">프로필렌(FOB Korea,Poly) <span className="text-gray-500 text-xs ml-1">[단위: $/톤]</span></p>
             </div>
             
-            <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start">
-              <div className="flex flex-col gap-1 w-full">
+            <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start gap-2">
+              <div className="flex flex-col gap-1 flex-1">
                 <div className="flex justify-between w-full items-center mb-1">
                   <p className="text-[10px] text-gray-500 font-medium tracking-wider">프로필렌</p>
                   <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestPropylene.date)}</p>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestPropylene.Propylene, 2)}</span>
-                  <span className={`text-sm font-medium ${propyleneChange.color}`}>({propyleneChange.diffText})</span>
+                  <span className="text-base sm:text-lg lg:text-xl font-bold text-white">${formatNumber(latestPropylene.Propylene, 2)}</span>
+                  <span className={`text-xs sm:text-sm font-medium ${propyleneChange.color}`}>({propyleneChange.diffText})</span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xs text-gray-400">전일: ${formatNumber(prevPropylene.Propylene, 2)}</span>
-                  <span className={`text-[10px] font-medium ${propyleneChange.color}`}>({propyleneChange.pctText})</span>
+                  <span className="text-[10px] sm:text-xs text-gray-400">전일: ${formatNumber(prevPropylene.Propylene, 2)}</span>
+                  <span className={`text-[9px] sm:text-[10px] font-medium ${propyleneChange.color}`}>({propyleneChange.pctText})</span>
                 </div>
               </div>
-              <div className="text-right min-w-[100px]">
-                <p className="text-[10px] text-gray-500 font-medium mb-1">프로필렌 Spread</p>
-                <p className={`text-lg lg:text-xl font-bold ${latestPropyleneSpread.PropyleneSpread !== undefined && latestPropyleneSpread.PropyleneSpread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+              <div className="text-right min-w-[85px] sm:min-w-[100px]">
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium mb-1 whitespace-nowrap">프로필렌 Spread</p>
+                <p className={`text-base sm:text-lg lg:text-xl font-bold ${latestPropyleneSpread.PropyleneSpread !== undefined && latestPropyleneSpread.PropyleneSpread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                   ${formatNumber(latestPropyleneSpread.PropyleneSpread, 2)}
                 </p>
               </div>
@@ -1174,24 +1183,24 @@ export function Dashboard() {
               <p className="text-sm text-gray-400 font-medium">부타디엔(FOB Korea) <span className="text-gray-500 text-xs ml-1">[단위: $/톤]</span></p>
             </div>
             
-            <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start">
-              <div className="flex flex-col gap-1 w-full">
+            <div className="bg-[#1C1C24] p-4 rounded-xl border border-[#2A2A35] mb-4 flex justify-between items-start gap-2">
+              <div className="flex flex-col gap-1 flex-1">
                 <div className="flex justify-between w-full items-center mb-1">
                   <p className="text-[10px] text-gray-500 font-medium tracking-wider">부타디엔</p>
                   <p className="text-[10px] text-gray-500 font-medium">{formatDateShort(latestButadiene.date)}</p>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-lg lg:text-xl font-bold text-white">${formatNumber(latestButadiene.Butadiene, 2)}</span>
-                  <span className={`text-sm font-medium ${butadieneChange.color}`}>({butadieneChange.diffText})</span>
+                  <span className="text-base sm:text-lg lg:text-xl font-bold text-white">${formatNumber(latestButadiene.Butadiene, 2)}</span>
+                  <span className={`text-xs sm:text-sm font-medium ${butadieneChange.color}`}>({butadieneChange.diffText})</span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xs text-gray-400">전일: ${formatNumber(prevButadiene.Butadiene, 2)}</span>
-                  <span className={`text-[10px] font-medium ${butadieneChange.color}`}>({butadieneChange.pctText})</span>
+                  <span className="text-[10px] sm:text-xs text-gray-400">전일: ${formatNumber(prevButadiene.Butadiene, 2)}</span>
+                  <span className={`text-[9px] sm:text-[10px] font-medium ${butadieneChange.color}`}>({butadieneChange.pctText})</span>
                 </div>
               </div>
-              <div className="text-right min-w-[100px]">
-                <p className="text-[10px] text-gray-500 font-medium mb-1">부타디엔 Spread</p>
-                <p className={`text-lg lg:text-xl font-bold ${latestButadieneSpread.ButadieneSpread !== undefined && latestButadieneSpread.ButadieneSpread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+              <div className="text-right min-w-[85px] sm:min-w-[100px]">
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium mb-1 whitespace-nowrap">부타디엔 Spread</p>
+                <p className={`text-base sm:text-lg lg:text-xl font-bold ${latestButadieneSpread.ButadieneSpread !== undefined && latestButadieneSpread.ButadieneSpread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                   ${formatNumber(latestButadieneSpread.ButadieneSpread, 2)}
                 </p>
               </div>
