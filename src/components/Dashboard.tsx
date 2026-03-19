@@ -210,6 +210,7 @@ export function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeNote, setActiveNote] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [hiddenLines, setHiddenLines] = useState<Record<string, boolean>>({});
   const [showNaphthaHelp, setShowNaphthaHelp] = useState(false);
   const [hoveredCountry, setHoveredCountry] = useState<{ show: boolean, country: string, x: number, y: number }>({ show: false, country: '', x: 0, y: 0 });
@@ -218,6 +219,31 @@ export function Dashboard() {
   const [showFMHelp, setShowFMHelp] = useState(false);
   const [showMoreFM, setShowMoreFM] = useState(false);
   const [fmBaseDate, setFmBaseDate] = useState('');
+
+  const toggleHelp = () => {
+    setIsHelpOpen(!isHelpOpen);
+    if (!isHelpOpen) setIsMenuOpen(false);
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    if (!isMenuOpen) setIsHelpOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.help-container') && !target.closest('.menu-container')) {
+        setIsHelpOpen(false);
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isHelpOpen || isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isHelpOpen, isMenuOpen]);
 
   const handleLegendClick = (e: any) => {
     setHiddenLines(prev => ({ ...prev, [e.dataKey]: !prev[e.dataKey] }));
@@ -232,8 +258,14 @@ export function Dashboard() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      const y = element.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      const headerOffset = 100;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
     setIsMenuOpen(false);
   };
@@ -527,54 +559,87 @@ export function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
-            <button 
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-lg bg-[#1C1C24] border border-[#2A2A35] text-gray-400 hover:text-white transition-colors"
-            >
-              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-
-          {/* Dropdown Menu */}
-          {isMenuOpen && (
-            <div className="absolute top-full right-4 sm:right-6 lg:right-8 mt-2 w-56 bg-[#1C1C24] border border-[#2A2A35] rounded-xl shadow-2xl overflow-hidden z-50">
-              <div className="py-2">
-                <button onClick={() => scrollToSection('crude-oil')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <Droplet size={14} className="text-blue-500" /> 원유 / CRUDE OIL
-                </button>
-                <button onClick={() => scrollToSection('natural-gas')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <Flame size={14} className="text-emerald-500" /> 천연가스
-                </button>
-                <button onClick={() => scrollToSection('naphtha')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <Factory size={14} className="text-purple-500" /> 납사(MOPJ)
-                </button>
-                <button onClick={() => scrollToSection('naphtha-damage')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <AlertTriangle size={14} className="text-rose-500" /> 중동 납사 피해현황
-                </button>
-                <button onClick={() => scrollToSection('ethylene')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <Activity size={14} className="text-amber-500" /> 에틸렌(CFR NEA)
-                </button>
-                <button onClick={() => scrollToSection('propylene')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <Activity size={14} className="text-cyan-500" /> 프로필렌(FOB Korea,Poly)
-                </button>
-                <button onClick={() => scrollToSection('butadiene')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <Activity size={14} className="text-pink-500" /> 부타디엔(FOB Korea)
-                </button>
-                <button onClick={() => scrollToSection('freight-spot')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <Ship size={14} className="text-indigo-400" /> 운임(현물)
-                </button>
-                <button onClick={() => scrollToSection('freight-futures')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <Ship size={14} className="text-blue-400" /> 운임(선물)
-                </button>
-                <button onClick={() => scrollToSection('force-majeure')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <AlertTriangle size={14} className="text-rose-500" /> Force Majeure 현황
-                </button>
-                <button onClick={() => scrollToSection('exchange-rate')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                  <Activity size={14} className="text-yellow-500" /> 환율
-                </button>
-              </div>
+            <div className="relative help-container">
+              <button 
+                onClick={toggleHelp}
+                className={`p-2 rounded-lg border transition-colors ${isHelpOpen ? 'bg-purple-500/20 border-purple-500/50 text-purple-400' : 'bg-[#1C1C24] border-[#2A2A35] text-gray-400 hover:text-white'}`}
+                title="도움말"
+              >
+                {isHelpOpen ? <X size={20} /> : <HelpCircle size={20} />}
+              </button>
+              
+              {isHelpOpen && (
+                <div className="absolute top-full right-0 mt-2 w-72 sm:w-80 bg-[#1C1C24] border border-[#2A2A35] rounded-xl shadow-2xl p-4 z-[60] text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  <div className="space-y-3">
+                    <div>
+                      <p className="font-bold text-white mb-1 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                        가격 지표
+                      </p>
+                      <p className="pl-3">전일자 종가 기준 (매일 오전 업데이트)</p>
+                      <p className="pl-3 text-gray-500 mt-1 italic">예: WTI 26.03.18 → 해당 날짜(18일)의 최종 고시 가격</p>
+                    </div>
+                    <div className="pt-3 border-t border-[#2A2A35]">
+                      <p className="font-bold text-white mb-1 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        현황 리스트
+                      </p>
+                      <p className="pl-3">변동 사항 발생 시 수시 갱신 (항목별 업데이트 일자 별도 표기)</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+            <div className="relative menu-container">
+              <button 
+                onClick={toggleMenu}
+                className="p-2 rounded-lg bg-[#1C1C24] border border-[#2A2A35] text-gray-400 hover:text-white transition-colors"
+              >
+                {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+
+              {/* Dropdown Menu */}
+              {isMenuOpen && (
+                <div className="absolute top-full right-0 mt-2 w-56 bg-[#1C1C24] border border-[#2A2A35] rounded-xl shadow-2xl overflow-hidden z-50">
+                  <div className="py-2">
+                    <button onClick={() => scrollToSection('crude-oil')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <Droplet size={14} className="text-blue-500" /> 원유 / CRUDE OIL
+                    </button>
+                    <button onClick={() => scrollToSection('natural-gas')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <Flame size={14} className="text-emerald-500" /> 천연가스
+                    </button>
+                    <button onClick={() => scrollToSection('naphtha')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <Factory size={14} className="text-purple-500" /> 납사(MOPJ)
+                    </button>
+                    <button onClick={() => scrollToSection('naphtha-damage')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <AlertTriangle size={14} className="text-rose-500" /> 중동 납사 피해현황
+                    </button>
+                    <button onClick={() => scrollToSection('ethylene')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <Activity size={14} className="text-amber-500" /> 에틸렌(CFR NEA)
+                    </button>
+                    <button onClick={() => scrollToSection('propylene')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <Activity size={14} className="text-cyan-500" /> 프로필렌(FOB Korea,Poly)
+                    </button>
+                    <button onClick={() => scrollToSection('butadiene')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <Activity size={14} className="text-pink-500" /> 부타디엔(FOB Korea)
+                    </button>
+                    <button onClick={() => scrollToSection('freight-spot')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <Ship size={14} className="text-indigo-400" /> 운임(현물)
+                    </button>
+                    <button onClick={() => scrollToSection('freight-futures')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <Ship size={14} className="text-blue-400" /> 운임(선물)
+                    </button>
+                    <button onClick={() => scrollToSection('force-majeure')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <AlertTriangle size={14} className="text-rose-500" /> Force Majeure 현황
+                    </button>
+                    <button onClick={() => scrollToSection('exchange-rate')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
+                      <Activity size={14} className="text-yellow-500" /> 환율
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
