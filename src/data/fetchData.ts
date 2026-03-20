@@ -15,7 +15,8 @@ const GIDS = {
   OPERATING_RATES: '1209759407',
   TURNAROUND: '720422684',
   EXCHANGE_RATE: '1275419118',
-  REALTIME_PRICE: '1677894699'
+  REALTIME_PRICE: '1677894699',
+  NAPHTHA_DAMAGE: '1100386465'
 };
 
 async function fetchCsv(gid: string) {
@@ -38,7 +39,8 @@ export async function fetchDashboardData() {
     operatingRatesRaw,
     turnaroundRaw,
     exchangeRateRaw,
-    realtimePriceRaw
+    realtimePriceRaw,
+    naphthaDamageRaw
   ] = await Promise.all([
     fetchCsv(GIDS.OIL),
     fetchCsv(GIDS.NATURAL_GAS),
@@ -52,7 +54,8 @@ export async function fetchDashboardData() {
     fetchCsv(GIDS.OPERATING_RATES),
     fetchCsv(GIDS.TURNAROUND),
     fetchCsv(GIDS.EXCHANGE_RATE),
-    fetchCsv(GIDS.REALTIME_PRICE)
+    fetchCsv(GIDS.REALTIME_PRICE),
+    fetchCsv(GIDS.NAPHTHA_DAMAGE)
   ]);
 
   // Parse Real-time Prices
@@ -226,6 +229,22 @@ export async function fetchDashboardData() {
     EUR: parseFloat(row[5]?.replace(/,/g, ''))
   })).filter(row => row.date && !isNaN(row.USD));
 
+  // Parse Naphtha Damage
+  // Row 1: [마지막 업데이트 날짜, 26.03.19, ...]
+  const naphthaDamageBaseDate = naphthaDamageRaw[1]?.[1] || '26.03.12';
+  
+  // Data starts from row 4 (index 3)
+  const naphthaDamageDetails = naphthaDamageRaw.slice(3).map(row => ({
+    area: row[1],
+    country: row[2],
+    origin: row[3],
+    port: row[4],
+    existing: parseFloat(row[5]?.replace(/,/g, '')) || 0,
+    tank: parseFloat(row[6]?.replace(/,/g, '')) || 0,
+    drone: parseFloat(row[7]?.replace(/,/g, '')) || 0,
+    note: row[8]
+  })).filter(row => row.country);
+
   return {
     oilData,
     naturalGasData,
@@ -240,6 +259,8 @@ export async function fetchDashboardData() {
     operatingRatesData,
     turnaroundData,
     exchangeRateData,
-    realtimePrice
+    realtimePrice,
+    naphthaDamageDetails,
+    naphthaDamageBaseDate
   };
 }

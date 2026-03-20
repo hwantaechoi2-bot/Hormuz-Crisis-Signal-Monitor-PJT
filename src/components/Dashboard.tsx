@@ -162,52 +162,6 @@ const formatHeaderTime = (date: Date) => {
   return `${yyyy}.${mm}.${dd}(${day}) / ${ampm} ${hh}:${min}:${ss}[KST]`;
 };
 
-const naphthaDetails: Record<string, { origin: string, port: string, existing?: number, tank?: number, drone?: number, note: string }[]> = {
-  'Kuwait': [
-    { origin: 'Mina Al-Ahmadi Refinery', port: 'MAA+MAB', existing: 266, tank: 0, drone: 0, note: '' },
-    { origin: 'Mina Abdulla Refinery', port: 'MAB', existing: 200, tank: 100, drone: 0, note: 'Tank 제약으로 S/D' },
-    { origin: 'Al-Zour', port: 'Mina Al Zour', existing: 200, tank: 66, drone: 0, note: 'Tank 제약으로 가동율 조정(△25%)' },
-  ],
-  'Saudi': [
-    { origin: 'Yanbu Refinery', port: 'Yanbu', existing: 100, tank: 0, drone: 0, note: '사우디 West' },
-    { origin: 'Rabigh Refinery', port: 'Rabigh', existing: 100, tank: 0, drone: 0, note: '사우디 West' },
-    { origin: 'Jubail(Shell/Aramco)', port: 'Jubail', existing: 100, tank: 0, drone: 0, note: '' },
-    { origin: 'Ras Tanura Refinery', port: 'Ras Tanura', existing: 150, tank: 0, drone: 150, note: 'Drone attack : Main 설비 이상 없음, 현재 재가동 준비중' },
-    { origin: 'Saudi/Total Jubail Refinery', port: 'Jubail', existing: 100, tank: 0, drone: 0, note: '' },
-  ],
-  'Bahrain': [
-    { origin: 'BAPCO', port: 'B220', existing: 115, tank: 0, drone: 0, note: '' },
-    { origin: 'BAPCO', port: 'B210', existing: 100, tank: 15, drone: 100, note: 'Drone attack : Tank Area 영향 (사전 예방 조치로 CDU S/D)' },
-  ],
-  'Qatar': [
-    { origin: 'Mesaieed', port: 'NGL', existing: 100, tank: 0, drone: 100, note: 'Drone attack : 생산 중단' },
-    { origin: 'Ras LaffanⅠ', port: 'FRN', existing: 200, tank: 200, drone: 0, note: 'Tank 제약에 따른 FM' },
-    { origin: 'Ras LaffanⅡ', port: 'FRN', existing: 200, tank: 200, drone: 0, note: 'Tank 제약에 따른 FM' },
-    { origin: 'Ras LaffanⅡ', port: 'PC', existing: 100, tank: 0, drone: 100, note: 'Drone attack : 생산 중단' },
-    { origin: 'Ras LaffanⅡ', port: 'GTL', existing: 100, tank: 0, drone: 75, note: 'Drone attack : 생산 중단' },
-    { origin: 'Pearl GTL', port: 'GTL', existing: 133, tank: 100, drone: 0, note: 'Tank 제약에 따른 FM' },
-  ],
-  'UAE': [
-    { origin: 'GASCO', port: 'Ruwais', existing: 200, tank: 30, drone: 0, note: 'Tank 제약에 따른 ADNOC Trading FM 준비 중' },
-    { origin: 'Umm Al Nar Refinery', port: 'Ruwais', existing: 200, tank: 30, drone: 0, note: 'Tank 제약에 따른 ADNOC Trading FM 준비 중' },
-    { origin: 'Condensate Splitter', port: 'Ruwais', existing: 200, tank: 34, drone: 0, note: 'Tank 제약으로 가동율 조정(△20%)' },
-    { origin: 'Ruwais New Refinery', port: 'Ruwais', existing: 389, tank: 0, drone: 417, note: 'Drone Attack : S/D (FCC 내 프로필렌 Tank 손실)' },
-    { origin: 'Jebel Ali Splitter', port: 'Jebel Ali', existing: 200, tank: 0, drone: 0, note: 'Tank 제약으로 가동율 조정(△20%)' },
-  ],
-  'IRAQ': [
-    { origin: 'Somo', port: '', existing: 100, tank: 25, drone: 0, note: '' },
-    { origin: 'Basrah', port: '', existing: 100, tank: 25, drone: 0, note: '' },
-    { origin: 'Kurdish', port: '', existing: 100, tank: 25, drone: 0, note: '' },
-    { origin: 'Unusual Seller', port: '', existing: 90, tank: 25, drone: 0, note: 'Vitol Splitter 가동정지' },
-  ],
-  'Oman': [
-    { origin: 'Duqm Refinery', port: 'Duqm', existing: 200, tank: 0, drone: 0, note: '오만항 Drone Attack 이후 임시 Close → 현재 운영중' },
-  ],
-  'Egypt': [
-    { origin: '', port: 'Suez', existing: 100, tank: 0, drone: 0, note: '' },
-  ],
-};
-
 export function Dashboard() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -387,7 +341,9 @@ export function Dashboard() {
         fmBaseDate: res.fmBaseDate,
         operatingRates: res.operatingRatesData,
         turnaround: res.turnaroundData,
-        realtimePrice: res.realtimePrice
+        realtimePrice: res.realtimePrice,
+        naphthaDamageDetails: res.naphthaDamageDetails,
+        naphthaDamageBaseDate: res.naphthaDamageBaseDate
       });
       setFmBaseDate(res.fmBaseDate);
     } catch (error) {
@@ -474,6 +430,41 @@ export function Dashboard() {
     if (!filteredData || !filteredData.freight) return [];
     return filteredData.freight.map((d: any) => d.date);
   }, [filteredData]);
+
+  const naphthaDamageSummary = useMemo<any[]>(() => {
+    if (!data?.naphthaDamageDetails) return [];
+    
+    const countries = Array.from(new Set((data.naphthaDamageDetails as any[]).map((item: any) => item.country)));
+    return countries.map(country => {
+      const countryData = (data.naphthaDamageDetails as any[]).filter((item: any) => item.country === country);
+      return {
+        country,
+        existing: countryData.reduce((sum: number, item: any) => sum + item.existing, 0),
+        tank: countryData.reduce((sum: number, item: any) => sum + item.tank, 0),
+        drone: countryData.reduce((sum: number, item: any) => sum + item.drone, 0),
+      };
+    });
+  }, [data?.naphthaDamageDetails]);
+
+  const naphthaDamageDetailsMap = useMemo<Record<string, any[]>>(() => {
+    if (!data?.naphthaDamageDetails) return {};
+    
+    const map: Record<string, any[]> = {};
+    (data.naphthaDamageDetails as any[]).forEach((item: any) => {
+      if (!map[item.country]) map[item.country] = [];
+      map[item.country].push(item);
+    });
+    return map;
+  }, [data?.naphthaDamageDetails]);
+
+  const naphthaDamageTotal = useMemo(() => {
+    if (!naphthaDamageSummary) return { existing: 0, tank: 0, drone: 0, ratio: 0 };
+    const existing = naphthaDamageSummary.reduce((sum, row) => sum + row.existing, 0);
+    const tank = naphthaDamageSummary.reduce((sum, row) => sum + row.tank, 0);
+    const drone = naphthaDamageSummary.reduce((sum, row) => sum + row.drone, 0);
+    const ratio = existing > 0 ? ((tank + drone) / existing) * 100 : 0;
+    return { existing, tank, drone, ratio };
+  }, [naphthaDamageSummary]);
 
   if (loading || !filteredData) {
     return (
@@ -1032,7 +1023,7 @@ export function Dashboard() {
                   <p className="text-sm text-gray-400 font-medium">중동 납사 피해현황</p>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2">
-                  <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">[26.03.12 기준]</span>
+                  <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">[{data?.naphthaDamageBaseDate || '26.03.12'} 기준]</span>
                   <div 
                     className="relative flex items-center justify-center text-gray-400 hover:text-white cursor-help"
                     onMouseEnter={() => setShowNaphthaHelp(true)}
@@ -1062,19 +1053,10 @@ export function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      { country: 'Kuwait', existing: 666, tank: 166, drone: 0 },
-                      { country: 'Saudi', existing: 548, tank: 0, drone: 150 },
-                      { country: 'Bahrain', existing: 215, tank: 15, drone: 100 },
-                      { country: 'Qatar', existing: 833, tank: 500, drone: 275 },
-                      { country: 'UAE', existing: 1189, tank: 94, drone: 417 },
-                      { country: 'IRAQ', existing: 390, tank: 100, drone: 0 },
-                      { country: 'Oman', existing: 200, tank: 0, drone: 0 },
-                      { country: 'Egypt', existing: 100, tank: 0, drone: 0 },
-                    ].map((row, idx) => {
+                    {naphthaDamageSummary.map((row, idx) => {
                       const ratio = ((row.tank + row.drone) / row.existing) * 100;
                       const isExpanded = expandedNaphthaRows.includes(row.country);
-                      const details = naphthaDetails[row.country] || [];
+                      const details = naphthaDamageDetailsMap[row.country] || [];
 
                       return (
                         <React.Fragment key={idx}>
@@ -1148,10 +1130,10 @@ export function Dashboard() {
                     })}
                     <tr className="bg-[#1C1C24] font-bold border-t-2 border-[#2A2A35]">
                       <td className="px-2 py-2 text-white">Total</td>
-                      <td className="px-2 py-2 text-right text-white">4,141</td>
-                      <td className="px-2 py-2 text-right text-amber-500">875</td>
-                      <td className="px-2 py-2 text-right text-rose-500">942</td>
-                      <td className="px-2 py-2 text-right text-white">43.9%</td>
+                      <td className="px-2 py-2 text-right text-white">{naphthaDamageTotal.existing.toLocaleString()}</td>
+                      <td className="px-2 py-2 text-right text-amber-500">{naphthaDamageTotal.tank.toLocaleString()}</td>
+                      <td className="px-2 py-2 text-right text-rose-500">{naphthaDamageTotal.drone.toLocaleString()}</td>
+                      <td className="px-2 py-2 text-right text-white">{naphthaDamageTotal.ratio.toFixed(1)}%</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1874,7 +1856,7 @@ export function Dashboard() {
       </div>
     </div>
       {/* Country Details Tooltip */}
-      {hoveredCountry.show && naphthaDetails[hoveredCountry.country] && (
+      {hoveredCountry.show && naphthaDamageDetailsMap[hoveredCountry.country] && (
         <div 
           className="fixed z-50 bg-[#1C1C24] border border-[#2A2A35] rounded-lg shadow-2xl p-3 pointer-events-none"
           style={{ 
@@ -1894,7 +1876,7 @@ export function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {naphthaDetails[hoveredCountry.country].map((detail, i) => (
+              {naphthaDamageDetailsMap[hoveredCountry.country].map((detail, i) => (
                 <tr key={i} className="border-b border-[#2A2A35] last:border-0">
                   <td className="px-2 py-1">{detail.origin || '-'}</td>
                   <td className="px-2 py-1">{detail.port || '-'}</td>
