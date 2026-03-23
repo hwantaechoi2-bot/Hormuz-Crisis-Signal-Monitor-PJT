@@ -1407,12 +1407,13 @@ export function Dashboard() {
                   <LineChart data={filteredData.freightSpot} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
                     <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                    <YAxis yAxisId="left" stroke="#6b7280" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                    <YAxis yAxisId="right" orientation="right" stroke="#f97316" fontSize={10} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
-                    <Line hide={!!hiddenLines['Clean']} type="monotone" dataKey="Clean" name="Clean" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
-                    <Line hide={!!hiddenLines['Dirty']} type="monotone" dataKey="Dirty" name="Dirty" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
-                    <Line hide={!!hiddenLines['BDI']} type="monotone" dataKey="BDI" name="BDI" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                    <Line hide={!!hiddenLines['Clean']} yAxisId="left" type="monotone" dataKey="Clean" name="Clean" stroke="#10b981" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                    <Line hide={!!hiddenLines['Dirty']} yAxisId="left" type="monotone" dataKey="Dirty" name="Dirty" stroke="#3b82f6" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
+                    <Line hide={!!hiddenLines['BDI']} yAxisId="right" type="monotone" dataKey="BDI" name="BDI(우)" stroke="#f97316" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
