@@ -7,12 +7,12 @@
   "theme_color": "#004F9F",
   "icons": [
     {
-      "src": "https://gemini.google.com/9f5597dd-6e6a-4bae-ac94-093e5b901613",
+      "src": "blob:https://gemini.google.com/9f5597dd-6e6a-4bae-ac94-093e5b901613",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://gemini.google.com/a36f3b8c-63a4-4b61-8ad8-5187e07a768b.png",
+      "src": "blob:https://gemini.google.com/a36f3b8c-63a4-4b61-8ad8-5187e07a768b",
       "sizes": "512x512",
       "type": "image/png"
     }
