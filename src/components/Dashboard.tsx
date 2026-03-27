@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/Card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Legend } from 'recharts';
 import { fetchDashboardData } from '../data/fetchData';
-import { TrendingUp, TrendingDown, AlertTriangle, Activity, Ship, Droplet, Factory, Settings, ChevronUp, ChevronDown, Info, Menu, X, Flame, HelpCircle, Zap, RefreshCw } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, Activity, Ship, Droplet, Factory, Settings, ChevronUp, ChevronDown, Info, Menu, X, Flame, HelpCircle, Zap, RefreshCw, Plus } from 'lucide-react';
 
 const formatNumber = (num: number | undefined, decimals: number = 2) => {
   if (num === undefined || num === null) return '-';
@@ -159,7 +159,7 @@ const formatHeaderTime = (date: Date) => {
   const min = kst.getMinutes().toString().padStart(2, '0');
   const ss = kst.getSeconds().toString().padStart(2, '0');
 
-  return `${yyyy}.${mm}.${dd}(${day}) / ${ampm} ${hh}:${min}:${ss}[KST]`;
+  return `${yyyy}.${mm}.${dd}(${day}) /\n${ampm} ${hh}:${min}:${ss}[KST]`;
 };
 
 export function Dashboard() {
@@ -189,6 +189,37 @@ export function Dashboard() {
   const [showOilHelp, setShowOilHelp] = useState(false);
   const [showMoreFM, setShowMoreFM] = useState(false);
   const [fmBaseDate, setFmBaseDate] = useState('');
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      if (isIOS) {
+        alert("iOS에서는 브라우저 하단의 '공유' 버튼을 누른 후 '홈 화면에 추가'를 선택하여 설치해 주세요.");
+      } else {
+        alert("PWA 설치를 위해 아이콘 파일(icon-192.png, icon-512.png)이 public 폴더에 필요하며, 브라우저가 설치 가능 상태를 감지해야 합니다. (이미 설치되어 있거나 지원하지 않는 환경일 수 있습니다.)");
+      }
+      return;
+    }
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
 
   const toggleHelp = () => {
     setIsHelpOpen(!isHelpOpen);
@@ -577,11 +608,18 @@ export function Dashboard() {
               <Activity className="text-purple-500 w-5 h-5 sm:w-6 sm:h-6" />
               Hormuz Crisis Signal Monitor
             </h1>
-            <div className="text-[11px] sm:text-sm font-medium text-gray-400 ml-7 sm:ml-0">
+            <div className="text-[11px] sm:text-sm font-medium text-gray-400 ml-7 sm:ml-0 leading-tight whitespace-pre-line">
               {formatHeaderTime(currentTime)}
             </div>
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
+            <button 
+              onClick={handleInstallClick}
+              className={`p-2 rounded-lg border transition-colors ${deferredPrompt ? 'bg-purple-500/20 border-purple-500/50 text-purple-400' : 'bg-[#1C1C24] border-[#2A2A35] text-gray-400 hover:text-white'}`}
+              title="앱 설치"
+            >
+              <Plus size={20} />
+            </button>
             <div className="relative help-container">
               <button 
                 onClick={toggleHelp}
