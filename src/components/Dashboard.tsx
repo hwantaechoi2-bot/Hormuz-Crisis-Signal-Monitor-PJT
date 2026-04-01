@@ -759,14 +759,14 @@ export function Dashboard() {
                   </div>
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">3. DUBAI</p>
-                    <p className="text-[9px] text-gray-400 leading-relaxed">DCB, 뉴욕상업거래소, 두바이유 (26.03.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 두바이 크루드 오일 선물의 최근월물 가격(두바이유는 현물거래임에 따라 실시간 가격 확인 제한)</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">DCB, 뉴욕상업거래소, 두바이유 (26.04.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 두바이 크루드 오일 선물의 최근월물 가격(두바이유는 현물거래임에 따라 실시간 가격 확인 제한)</p>
                   </div>
                 </div>
               )}
               
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
-                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">WTI</p>
+                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">WTI(26.05)</p>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.WTI, 2)}</span>
                   <div className={`flex items-center gap-1.5 mt-1 ${realtimeWtiChange.color}`}>
                     <span className="text-[10px] font-bold">{realtimeWtiChange.diffText}</span>
@@ -778,7 +778,7 @@ export function Dashboard() {
                   </div>
                 </div>
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
-                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Brent</p>
+                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Brent(26.06)</p>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Brent, 2)}</span>
                   <div className={`flex items-center gap-1.5 mt-1 ${realtimeBrentChange.color}`}>
                     <span className="text-[10px] font-bold">{realtimeBrentChange.diffText}</span>
@@ -790,7 +790,7 @@ export function Dashboard() {
                   </div>
                 </div>
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
-                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Dubai</p>
+                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Dubai(26.04)</p>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Dubai, 2)}</span>
                   <div className={`flex items-center gap-1.5 mt-1 ${realtimeDubaiChange.color}`}>
                     <span className="text-[10px] font-bold">{realtimeDubaiChange.diffText}</span>
