@@ -1217,9 +1217,11 @@ export function Dashboard() {
                   <span className={`text-[9px] sm:text-[10px] font-medium ${ethyleneChange.color}`}>({ethyleneChange.pctText})</span>
                 </div>
               </div>
-              <div className="text-right min-w-[85px] sm:min-w-[100px]">
-                <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium mb-1 whitespace-nowrap">에틸렌 Spread</p>
-                <p className={`text-base sm:text-lg lg:text-xl font-bold ${latestSpread.Spread !== undefined && latestSpread.Spread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+              <div className="text-right min-w-[70px] sm:min-w-[100px]">
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium mb-1 leading-tight">
+                  에틸렌<br/>Spread
+                </p>
+                <p className={`text-sm sm:text-lg lg:text-xl font-bold ${latestSpread.Spread !== undefined && latestSpread.Spread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                   ${formatNumber(latestSpread.Spread, 2)}
                 </p>
               </div>
@@ -1282,9 +1284,11 @@ export function Dashboard() {
                   <span className={`text-[9px] sm:text-[10px] font-medium ${propyleneChange.color}`}>({propyleneChange.pctText})</span>
                 </div>
               </div>
-              <div className="text-right min-w-[85px] sm:min-w-[100px]">
-                <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium mb-1 whitespace-nowrap">프로필렌 Spread</p>
-                <p className={`text-base sm:text-lg lg:text-xl font-bold ${latestPropyleneSpread.PropyleneSpread !== undefined && latestPropyleneSpread.PropyleneSpread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+              <div className="text-right min-w-[70px] sm:min-w-[100px]">
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium mb-1 leading-tight">
+                  프로필렌<br/>Spread
+                </p>
+                <p className={`text-sm sm:text-lg lg:text-xl font-bold ${latestPropyleneSpread.PropyleneSpread !== undefined && latestPropyleneSpread.PropyleneSpread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                   ${formatNumber(latestPropyleneSpread.PropyleneSpread, 2)}
                 </p>
               </div>
@@ -1347,9 +1351,11 @@ export function Dashboard() {
                   <span className={`text-[9px] sm:text-[10px] font-medium ${butadieneChange.color}`}>({butadieneChange.pctText})</span>
                 </div>
               </div>
-              <div className="text-right min-w-[85px] sm:min-w-[100px]">
-                <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium mb-1 whitespace-nowrap">부타디엔 Spread</p>
-                <p className={`text-base sm:text-lg lg:text-xl font-bold ${latestButadieneSpread.ButadieneSpread !== undefined && latestButadieneSpread.ButadieneSpread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+              <div className="text-right min-w-[70px] sm:min-w-[100px]">
+                <p className="text-[9px] sm:text-[10px] text-gray-500 font-medium mb-1 leading-tight">
+                  부타디엔<br/>Spread
+                </p>
+                <p className={`text-sm sm:text-lg lg:text-xl font-bold ${latestButadieneSpread.ButadieneSpread !== undefined && latestButadieneSpread.ButadieneSpread < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                   ${formatNumber(latestButadieneSpread.ButadieneSpread, 2)}
                 </p>
               </div>
