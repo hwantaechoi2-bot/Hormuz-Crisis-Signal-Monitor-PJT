@@ -335,10 +335,10 @@ export function Dashboard() {
       const freightGrouped: any = {};
       res.freightData.forEach(row => {
         if (!freightGrouped[row.date]) freightGrouped[row.date] = { date: row.date };
-        if (row.name.includes('3월물')) freightGrouped[row.date]['3월물'] = row.price;
         if (row.name.includes('4월물')) freightGrouped[row.date]['4월물'] = row.price;
         if (row.name.includes('5월물')) freightGrouped[row.date]['5월물'] = row.price;
         if (row.name.includes('6월물')) freightGrouped[row.date]['6월물'] = row.price;
+        if (row.name.includes('7월물')) freightGrouped[row.date]['7월물'] = row.price;
       });
       const processedFreight = Object.values(freightGrouped).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -445,7 +445,7 @@ export function Dashboard() {
   const freightChartData = useMemo(() => {
     if (!filteredData || !filteredData.freight) return [];
     
-    const months = ['3월물', '4월물', '5월물', '6월물'];
+    const months = ['4월물', '5월물', '6월물', '7월물'];
     return months.map(month => {
       const row: any = { month };
       filteredData.freight.forEach((d: any) => {
@@ -541,8 +541,8 @@ export function Dashboard() {
   const prevButadieneSpread = revPB.find(d => d.ButadieneSpread !== undefined && d.date !== latestButadieneSpread.date) || {};
 
   const revFreight = [...(data?.freight || [])].reverse();
-  const latestFreight = revFreight.find(d => d['3월물'] !== undefined || d['4월물'] !== undefined) || {};
-  const prevFreight = revFreight.find(d => (d['3월물'] !== undefined || d['4월물'] !== undefined) && d.date !== latestFreight.date) || {};
+  const latestFreight = revFreight.find(d => d['4월물'] !== undefined || d['5월물'] !== undefined) || {};
+  const prevFreight = revFreight.find(d => (d['4월물'] !== undefined || d['5월물'] !== undefined) && d.date !== latestFreight.date) || {};
 
   const revFreightSpot = [...(data?.freightSpot || [])].reverse();
   const latestBDI = revFreightSpot.find(d => d.BDI !== undefined) || {};
@@ -766,11 +766,14 @@ export function Dashboard() {
               
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
-                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">WTI(26.05)</p>
+                  <div className="flex flex-col items-center mb-1">
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">WTI</p>
+                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.05)</p>
+                  </div>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.WTI, 2)}</span>
-                  <div className={`flex items-center gap-1.5 mt-1 ${realtimeWtiChange.color}`}>
-                    <span className="text-[10px] font-bold">{realtimeWtiChange.diffText}</span>
-                    <span className="text-[10px] font-medium opacity-80">({realtimeWtiChange.pctText})</span>
+                  <div className={`flex flex-col items-center mt-1 ${realtimeWtiChange.color}`}>
+                    <span className="text-[10px] font-bold leading-tight">{realtimeWtiChange.diffText}</span>
+                    <span className="text-[9px] font-medium opacity-80 leading-tight">({realtimeWtiChange.pctText})</span>
                   </div>
                   <div className="mt-1 flex items-center gap-1">
                     <div className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
@@ -778,11 +781,14 @@ export function Dashboard() {
                   </div>
                 </div>
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
-                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Brent(26.06)</p>
+                  <div className="flex flex-col items-center mb-1">
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Brent</p>
+                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.06)</p>
+                  </div>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Brent, 2)}</span>
-                  <div className={`flex items-center gap-1.5 mt-1 ${realtimeBrentChange.color}`}>
-                    <span className="text-[10px] font-bold">{realtimeBrentChange.diffText}</span>
-                    <span className="text-[10px] font-medium opacity-80">({realtimeBrentChange.pctText})</span>
+                  <div className={`flex flex-col items-center mt-1 ${realtimeBrentChange.color}`}>
+                    <span className="text-[10px] font-bold leading-tight">{realtimeBrentChange.diffText}</span>
+                    <span className="text-[9px] font-medium opacity-80 leading-tight">({realtimeBrentChange.pctText})</span>
                   </div>
                   <div className="mt-1 flex items-center gap-1">
                     <div className="w-1 h-1 rounded-full bg-amber-500 animate-pulse" />
@@ -790,11 +796,14 @@ export function Dashboard() {
                   </div>
                 </div>
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
-                  <p className="text-[10px] text-gray-500 font-bold mb-1 uppercase tracking-widest">Dubai(26.04)</p>
+                  <div className="flex flex-col items-center mb-1">
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Dubai</p>
+                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.04)</p>
+                  </div>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Dubai, 2)}</span>
-                  <div className={`flex items-center gap-1.5 mt-1 ${realtimeDubaiChange.color}`}>
-                    <span className="text-[10px] font-bold">{realtimeDubaiChange.diffText}</span>
-                    <span className="text-[10px] font-medium opacity-80">({realtimeDubaiChange.pctText})</span>
+                  <div className={`flex flex-col items-center mt-1 ${realtimeDubaiChange.color}`}>
+                    <span className="text-[10px] font-bold leading-tight">{realtimeDubaiChange.diffText}</span>
+                    <span className="text-[9px] font-medium opacity-80 leading-tight">({realtimeDubaiChange.pctText})</span>
                   </div>
                 </div>
               </div>
@@ -1489,10 +1498,10 @@ export function Dashboard() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-4">
               {[
-                { label: '3월물', latest: latestFreight['3월물'], prev: prevFreight['3월물'], date: latestFreight.date },
                 { label: '4월물', latest: latestFreight['4월물'], prev: prevFreight['4월물'], date: latestFreight.date },
                 { label: '5월물', latest: latestFreight['5월물'], prev: prevFreight['5월물'], date: latestFreight.date },
                 { label: '6월물', latest: latestFreight['6월물'], prev: prevFreight['6월물'], date: latestFreight.date },
+                { label: '7월물', latest: latestFreight['7월물'], prev: prevFreight['7월물'], date: latestFreight.date },
               ].map((item) => {
                 const change = calculateChange(item.latest, item.prev);
                 return (
