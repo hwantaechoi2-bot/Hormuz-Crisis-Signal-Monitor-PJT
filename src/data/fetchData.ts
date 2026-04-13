@@ -242,7 +242,8 @@ export async function fetchDashboardData() {
     existing: parseFloat(row[5]?.replace(/,/g, '')) || 0,
     tank: parseFloat(row[6]?.replace(/,/g, '')) || 0,
     drone: parseFloat(row[7]?.replace(/,/g, '')) || 0,
-    note: row[8]
+    selfConsumption: parseFloat(row[8]?.replace(/,/g, '')) || 0,
+    note: row[9]
   })).filter(row => row.country);
 
   return {

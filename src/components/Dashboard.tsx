@@ -473,6 +473,7 @@ export function Dashboard() {
         existing: countryData.reduce((sum: number, item: any) => sum + item.existing, 0),
         tank: countryData.reduce((sum: number, item: any) => sum + item.tank, 0),
         drone: countryData.reduce((sum: number, item: any) => sum + item.drone, 0),
+        selfConsumption: countryData.reduce((sum: number, item: any) => sum + item.selfConsumption, 0),
       };
     });
   }, [data?.naphthaDamageDetails]);
@@ -489,12 +490,13 @@ export function Dashboard() {
   }, [data?.naphthaDamageDetails]);
 
   const naphthaDamageTotal = useMemo(() => {
-    if (!naphthaDamageSummary) return { existing: 0, tank: 0, drone: 0, ratio: 0 };
+    if (!naphthaDamageSummary) return { existing: 0, tank: 0, drone: 0, selfConsumption: 0, ratio: 0 };
     const existing = naphthaDamageSummary.reduce((sum, row) => sum + row.existing, 0);
     const tank = naphthaDamageSummary.reduce((sum, row) => sum + row.tank, 0);
     const drone = naphthaDamageSummary.reduce((sum, row) => sum + row.drone, 0);
-    const ratio = existing > 0 ? ((tank + drone) / existing) * 100 : 0;
-    return { existing, tank, drone, ratio };
+    const selfConsumption = naphthaDamageSummary.reduce((sum, row) => sum + row.selfConsumption, 0);
+    const ratio = existing > 0 ? ((tank + drone + selfConsumption) / existing) * 100 : 0;
+    return { existing, tank, drone, selfConsumption, ratio };
   }, [naphthaDamageSummary]);
 
   if (loading || !filteredData) {
@@ -1092,16 +1094,17 @@ export function Dashboard() {
                 <table className="w-full text-[11px] text-left text-gray-300">
                   <thead className="text-[10px] text-gray-400 bg-[#1C1C24] border-b border-[#2A2A35]">
                     <tr>
-                      <th className="px-2 py-2 font-medium">Country</th>
-                      <th className="px-2 py-2 font-medium text-right">기존판매량</th>
-                      <th className="px-2 py-2 font-medium text-right">Tank제약</th>
-                      <th className="px-2 py-2 font-medium text-right">Drone피해</th>
-                      <th className="px-2 py-2 font-medium text-right">피해비중</th>
+                      <th className="px-2 py-2 font-medium align-bottom whitespace-nowrap">Country</th>
+                      <th className="px-2 py-2 font-medium text-right align-bottom leading-tight whitespace-nowrap">기존<br/>판매량</th>
+                      <th className="px-2 py-2 font-medium text-right align-bottom leading-tight whitespace-nowrap">Tank<br/>제약</th>
+                      <th className="px-2 py-2 font-medium text-right align-bottom leading-tight whitespace-nowrap">Drone<br/>피해</th>
+                      <th className="px-2 py-2 font-medium text-right align-bottom leading-tight whitespace-nowrap min-w-[60px]">자체소비<br/>물량감소</th>
+                      <th className="px-2 py-2 font-medium text-right align-bottom leading-tight whitespace-nowrap">피해<br/>비중</th>
                     </tr>
                   </thead>
                   <tbody>
                     {naphthaDamageSummary.map((row, idx) => {
-                      const ratio = ((row.tank + row.drone) / row.existing) * 100;
+                      const ratio = ((row.tank + row.drone + row.selfConsumption) / row.existing) * 100;
                       const isExpanded = expandedNaphthaRows.includes(row.country);
                       const details = naphthaDamageDetailsMap[row.country] || [];
 
@@ -1124,13 +1127,14 @@ export function Dashboard() {
                             <td className="px-2 py-2 text-right">{row.existing.toLocaleString()}</td>
                             <td className="px-2 py-2 text-right text-amber-500">{row.tank > 0 ? row.tank.toLocaleString() : '-'}</td>
                             <td className="px-2 py-2 text-right text-rose-500">{row.drone > 0 ? row.drone.toLocaleString() : '-'}</td>
+                            <td className="px-2 py-2 text-right text-cyan-500">{row.selfConsumption > 0 ? row.selfConsumption.toLocaleString() : '-'}</td>
                             <td className="px-2 py-2 text-right font-bold text-white">
                               {ratio > 0 ? `${ratio.toFixed(1)}%` : '-'}
                             </td>
                           </tr>
                           {isExpanded && details.length > 0 && (
                             <tr>
-                              <td colSpan={5} className="px-0 py-0">
+                              <td colSpan={6} className="px-0 py-0">
                                 <div 
                                   className="bg-[#1C1C24] p-3 border-b border-[#2A2A35] cursor-pointer"
                                   onClick={() => {
@@ -1160,6 +1164,10 @@ export function Dashboard() {
                                           <span className="text-gray-500">Drone 피해:</span>
                                           <span className="text-rose-500 font-medium">{detail.drone && detail.drone > 0 ? detail.drone.toLocaleString() : '-'}</span>
                                         </div>
+                                        <div className="flex justify-between mb-1">
+                                          <span className="text-gray-500">자체 소비 물량 감소:</span>
+                                          <span className="text-cyan-500 font-medium">{detail.selfConsumption && detail.selfConsumption > 0 ? detail.selfConsumption.toLocaleString() : '-'}</span>
+                                        </div>
                                         {detail.note && (
                                           <div className="mt-1 pt-1 border-t border-[#2A2A35] text-rose-400 italic">
                                             {detail.note}
@@ -1180,13 +1188,14 @@ export function Dashboard() {
                       <td className="px-2 py-2 text-right text-white">{naphthaDamageTotal.existing.toLocaleString()}</td>
                       <td className="px-2 py-2 text-right text-amber-500">{naphthaDamageTotal.tank.toLocaleString()}</td>
                       <td className="px-2 py-2 text-right text-rose-500">{naphthaDamageTotal.drone.toLocaleString()}</td>
+                      <td className="px-2 py-2 text-right text-cyan-500">{naphthaDamageTotal.selfConsumption.toLocaleString()}</td>
                       <td className="px-2 py-2 text-right text-white">{naphthaDamageTotal.ratio.toFixed(1)}%</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <div className="mt-2 text-right text-[10px] text-gray-500">
-                * 단위: 천톤
+                * 단위: 천톤/월
               </div>
             </CardContent>
           </Card>
