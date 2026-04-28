@@ -757,7 +757,7 @@ export function Dashboard() {
                   </div>
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">2. BRENT</p>
-                    <p className="text-[9px] text-gray-400 leading-relaxed">BRN, 유럽 ICE선물거래소, 브렌트유 (26.06.)<br/>ICE 선물거래소에서 거래되는 영국 브렌트유 선물의 최근월물 가격</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">BRN, 유럽 ICE선물거래소, 브렌트유 (26.07.)<br/>ICE 선물거래소에서 거래되는 영국 브렌트유 선물의 최근월물 가격</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">3. DUBAI</p>
@@ -785,7 +785,7 @@ export function Dashboard() {
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
                   <div className="flex flex-col items-center mb-1">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Brent</p>
-                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.06)</p>
+                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.07)</p>
                   </div>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Brent, 2)}</span>
                   <div className={`flex flex-col items-center mt-1 ${realtimeBrentChange.color}`}>
