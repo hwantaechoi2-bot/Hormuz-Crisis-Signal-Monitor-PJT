@@ -335,10 +335,10 @@ export function Dashboard() {
       const freightGrouped: any = {};
       res.freightData.forEach(row => {
         if (!freightGrouped[row.date]) freightGrouped[row.date] = { date: row.date };
-        if (row.name.includes('4월물')) freightGrouped[row.date]['4월물'] = row.price;
         if (row.name.includes('5월물')) freightGrouped[row.date]['5월물'] = row.price;
         if (row.name.includes('6월물')) freightGrouped[row.date]['6월물'] = row.price;
         if (row.name.includes('7월물')) freightGrouped[row.date]['7월물'] = row.price;
+        if (row.name.includes('8월물')) freightGrouped[row.date]['8월물'] = row.price;
       });
       const processedFreight = Object.values(freightGrouped).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -445,7 +445,7 @@ export function Dashboard() {
   const freightChartData = useMemo(() => {
     if (!filteredData || !filteredData.freight) return [];
     
-    const months = ['4월물', '5월물', '6월물', '7월물'];
+    const months = ['5월물', '6월물', '7월물', '8월물'];
     return months.map(month => {
       const row: any = { month };
       filteredData.freight.forEach((d: any) => {
@@ -543,8 +543,8 @@ export function Dashboard() {
   const prevButadieneSpread = revPB.find(d => d.ButadieneSpread !== undefined && d.date !== latestButadieneSpread.date) || {};
 
   const revFreight = [...(data?.freight || [])].reverse();
-  const latestFreight = revFreight.find(d => d['4월물'] !== undefined || d['5월물'] !== undefined) || {};
-  const prevFreight = revFreight.find(d => (d['4월물'] !== undefined || d['5월물'] !== undefined) && d.date !== latestFreight.date) || {};
+  const latestFreight = revFreight.find(d => d['5월물'] !== undefined || d['6월물'] !== undefined) || {};
+  const prevFreight = revFreight.find(d => (d['5월물'] !== undefined || d['6월물'] !== undefined) && d.date !== latestFreight.date) || {};
 
   const revFreightSpot = [...(data?.freightSpot || [])].reverse();
   const latestBDI = revFreightSpot.find(d => d.BDI !== undefined) || {};
@@ -1513,10 +1513,10 @@ export function Dashboard() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-4">
               {[
-                { label: '4월물', latest: latestFreight['4월물'], prev: prevFreight['4월물'], date: latestFreight.date },
                 { label: '5월물', latest: latestFreight['5월물'], prev: prevFreight['5월물'], date: latestFreight.date },
                 { label: '6월물', latest: latestFreight['6월물'], prev: prevFreight['6월물'], date: latestFreight.date },
                 { label: '7월물', latest: latestFreight['7월물'], prev: prevFreight['7월물'], date: latestFreight.date },
+                { label: '8월물', latest: latestFreight['8월물'], prev: prevFreight['8월물'], date: latestFreight.date },
               ].map((item) => {
                 const change = calculateChange(item.latest, item.prev);
                 return (
