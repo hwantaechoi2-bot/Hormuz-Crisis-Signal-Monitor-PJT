@@ -335,10 +335,10 @@ export function Dashboard() {
       const freightGrouped: any = {};
       res.freightData.forEach(row => {
         if (!freightGrouped[row.date]) freightGrouped[row.date] = { date: row.date };
-        if (row.name.includes('5월물')) freightGrouped[row.date]['5월물'] = row.price;
         if (row.name.includes('6월물')) freightGrouped[row.date]['6월물'] = row.price;
         if (row.name.includes('7월물')) freightGrouped[row.date]['7월물'] = row.price;
         if (row.name.includes('8월물')) freightGrouped[row.date]['8월물'] = row.price;
+        if (row.name.includes('9월물')) freightGrouped[row.date]['9월물'] = row.price;
       });
       const processedFreight = Object.values(freightGrouped).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -445,7 +445,7 @@ export function Dashboard() {
   const freightChartData = useMemo(() => {
     if (!filteredData || !filteredData.freight) return [];
     
-    const months = ['5월물', '6월물', '7월물', '8월물'];
+    const months = ['6월물', '7월물', '8월물', '9월물'];
     return months.map(month => {
       const row: any = { month };
       filteredData.freight.forEach((d: any) => {
@@ -543,8 +543,8 @@ export function Dashboard() {
   const prevButadieneSpread = revPB.find(d => d.ButadieneSpread !== undefined && d.date !== latestButadieneSpread.date) || {};
 
   const revFreight = [...(data?.freight || [])].reverse();
-  const latestFreight = revFreight.find(d => d['5월물'] !== undefined || d['6월물'] !== undefined) || {};
-  const prevFreight = revFreight.find(d => (d['5월물'] !== undefined || d['6월물'] !== undefined) && d.date !== latestFreight.date) || {};
+  const latestFreight = revFreight.find(d => d['6월물'] !== undefined || d['7월물'] !== undefined) || {};
+  const prevFreight = revFreight.find(d => (d['6월물'] !== undefined || d['7월물'] !== undefined) && d.date !== latestFreight.date) || {};
 
   const revFreightSpot = [...(data?.freightSpot || [])].reverse();
   const latestBDI = revFreightSpot.find(d => d.BDI !== undefined) || {};
@@ -757,11 +757,11 @@ export function Dashboard() {
                   </div>
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">2. BRENT</p>
-                    <p className="text-[9px] text-gray-400 leading-relaxed">BRN, 유럽 ICE선물거래소, 브렌트유 (26.07.)<br/>ICE 선물거래소에서 거래되는 영국 브렌트유 선물의 최근월물 가격</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">BRN, 유럽 ICE선물거래소, 브렌트유 (26.08.)<br/>ICE 선물거래소에서 거래되는 영국 브렌트유 선물의 최근월물 가격</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">3. DUBAI</p>
-                    <p className="text-[9px] text-gray-400 leading-relaxed">DCB, 뉴욕상업거래소, 두바이유 (26.05.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 두바이 크루드 오일 선물의 최근월물 가격(두바이유는 현물거래임에 따라 실시간 가격 확인 제한)</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">DCB, 뉴욕상업거래소, 두바이유 (26.06.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 두바이 크루드 오일 선물의 최근월물 가격(두바이유는 현물거래임에 따라 실시간 가격 확인 제한)</p>
                   </div>
                 </div>
               )}
@@ -785,7 +785,7 @@ export function Dashboard() {
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
                   <div className="flex flex-col items-center mb-1">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Brent</p>
-                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.07)</p>
+                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.08)</p>
                   </div>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Brent, 2)}</span>
                   <div className={`flex flex-col items-center mt-1 ${realtimeBrentChange.color}`}>
@@ -800,7 +800,7 @@ export function Dashboard() {
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
                   <div className="flex flex-col items-center mb-1">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Dubai</p>
-                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.05)</p>
+                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.06)</p>
                   </div>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Dubai, 2)}</span>
                   <div className={`flex flex-col items-center mt-1 ${realtimeDubaiChange.color}`}>
@@ -1513,10 +1513,10 @@ export function Dashboard() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-4">
               {[
-                { label: '5월물', latest: latestFreight['5월물'], prev: prevFreight['5월물'], date: latestFreight.date },
                 { label: '6월물', latest: latestFreight['6월물'], prev: prevFreight['6월물'], date: latestFreight.date },
                 { label: '7월물', latest: latestFreight['7월물'], prev: prevFreight['7월물'], date: latestFreight.date },
                 { label: '8월물', latest: latestFreight['8월물'], prev: prevFreight['8월물'], date: latestFreight.date },
+                { label: '9월물', latest: latestFreight['9월물'], prev: prevFreight['9월물'], date: latestFreight.date },
               ].map((item) => {
                 const change = calculateChange(item.latest, item.prev);
                 return (
