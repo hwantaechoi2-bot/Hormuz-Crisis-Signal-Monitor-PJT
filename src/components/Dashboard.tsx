@@ -686,9 +686,6 @@ export function Dashboard() {
                     <button onClick={() => scrollToSection('naphtha')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
                       <Factory size={14} className="text-purple-500" /> 납사(MOPJ)
                     </button>
-                    <button onClick={() => scrollToSection('naphtha-damage')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                      <AlertTriangle size={14} className="text-rose-500" /> 중동 납사 피해현황
-                    </button>
                     <button onClick={() => scrollToSection('ethylene')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
                       <Activity size={14} className="text-amber-500" /> 에틸렌(CFR NEA)
                     </button>
@@ -703,9 +700,6 @@ export function Dashboard() {
                     </button>
                     <button onClick={() => scrollToSection('freight-futures')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
                       <Ship size={14} className="text-blue-400" /> 운임(선물)
-                    </button>
-                    <button onClick={() => scrollToSection('force-majeure')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
-                      <AlertTriangle size={14} className="text-rose-500" /> Force Majeure 현황
                     </button>
                     <button onClick={() => scrollToSection('exchange-rate')} className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-[#2A2A35] hover:text-white transition-colors flex items-center gap-2">
                       <Activity size={14} className="text-yellow-500" /> 환율
@@ -753,7 +747,7 @@ export function Dashboard() {
                 <div className="mb-4 p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">1. WTI</p>
-                    <p className="text-[9px] text-gray-400 leading-relaxed">CL, 뉴욕상업거래소, 서부텍사스산 원유 (26.07.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 WTI(Western Texas Intermediate) 선물의 최근월물 가격</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">CL, 뉴욕상업거래소, 서부텍사스산 원유 (26.08.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 WTI(Western Texas Intermediate) 선물의 최근월물 가격</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">2. BRENT</p>
@@ -761,7 +755,7 @@ export function Dashboard() {
                   </div>
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">3. DUBAI</p>
-                    <p className="text-[9px] text-gray-400 leading-relaxed">DCB, 뉴욕상업거래소, 두바이유 (26.06.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 두바이 크루드 오일 선물의 최근월물 가격(두바이유는 현물거래임에 따라 실시간 가격 확인 제한)</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">DCB, 뉴욕상업거래소, 두바이유 (26.07.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 두바이 크루드 오일 선물의 최근월물 가격(두바이유는 현물거래임에 따라 실시간 가격 확인 제한)</p>
                   </div>
                 </div>
               )}
@@ -770,7 +764,7 @@ export function Dashboard() {
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
                   <div className="flex flex-col items-center mb-1">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">WTI</p>
-                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.07)</p>
+                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.08)</p>
                   </div>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.WTI, 2)}</span>
                   <div className={`flex flex-col items-center mt-1 ${realtimeWtiChange.color}`}>
@@ -800,7 +794,7 @@ export function Dashboard() {
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
                   <div className="flex flex-col items-center mb-1">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Dubai</p>
-                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.06)</p>
+                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.07)</p>
                   </div>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Dubai, 2)}</span>
                   <div className={`flex flex-col items-center mt-1 ${realtimeDubaiChange.color}`}>
@@ -1057,145 +1051,6 @@ export function Dashboard() {
                     <Line hide={!!hiddenLines['Naphtha']} type="monotone" dataKey="Naphtha" stroke="#a855f7" strokeWidth={2} dot={false} connectNulls={true} isAnimationActive={true} />
                   </LineChart>
                 </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Middle East Naphtha Damage Status */}
-          <Card id="naphtha-damage" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24] flex-grow relative">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500">
-                    <AlertTriangle size={16} />
-                  </div>
-                  <p className="text-sm text-gray-400 font-medium">중동 납사 피해현황</p>
-                </div>
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">[{data?.naphthaDamageBaseDate || '26.03.12'} 기준]</span>
-                  <div 
-                    className="relative flex items-center justify-center text-gray-400 hover:text-white cursor-help"
-                    onMouseEnter={() => setShowNaphthaHelp(true)}
-                    onMouseLeave={() => setShowNaphthaHelp(false)}
-                    onTouchStart={() => setShowNaphthaHelp(true)}
-                    onTouchEnd={() => setShowNaphthaHelp(false)}
-                  >
-                    <HelpCircle size={14} />
-                    {showNaphthaHelp && (
-                      <div className="absolute right-0 top-6 w-64 p-3 bg-[#2A2A35] border border-gray-600 rounded-lg shadow-xl z-50 text-xs text-gray-200 whitespace-pre-line">
-                        ①Tank 제약: Tank 제약 경우 호르무즈 Open 정상화 가능{"\n"}
-                        ② Drone Attack 영향
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-[11px] text-left text-gray-300">
-                  <thead className="text-[10px] text-gray-400 bg-[#1C1C24] border-b border-[#2A2A35]">
-                    <tr>
-                      <th className="px-2 py-2 font-medium align-bottom whitespace-nowrap">Country</th>
-                      <th className="px-2 py-2 font-medium text-right align-bottom leading-tight whitespace-nowrap">기존<br/>판매량</th>
-                      <th className="px-2 py-2 font-medium text-right align-bottom leading-tight whitespace-nowrap">Tank<br/>제약</th>
-                      <th className="px-2 py-2 font-medium text-right align-bottom leading-tight whitespace-nowrap">Drone<br/>피해</th>
-                      <th className="px-2 py-2 font-medium text-right align-bottom leading-tight whitespace-nowrap min-w-[60px]">자체소비<br/>물량감소</th>
-                      <th className="px-2 py-2 font-medium text-right align-bottom leading-tight whitespace-nowrap">피해<br/>비중</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {naphthaDamageSummary.map((row, idx) => {
-                      const ratio = ((row.tank + row.drone + row.selfConsumption) / row.existing) * 100;
-                      const isExpanded = expandedNaphthaRows.includes(row.country);
-                      const details = naphthaDamageDetailsMap[row.country] || [];
-
-                      return (
-                        <React.Fragment key={idx}>
-                          <tr 
-                            className="border-b border-[#2A2A35] hover:bg-[#2A2A35]/50 transition-colors cursor-pointer"
-                            onClick={() => {
-                              setExpandedNaphthaRows(prev => 
-                                prev.includes(row.country) ? prev.filter(c => c !== row.country) : [...prev, row.country]
-                              );
-                            }}
-                          >
-                            <td className="px-2 py-2 font-medium text-white flex items-center gap-1">
-                              {row.country}
-                              {details.length > 0 && (
-                                isExpanded ? <ChevronUp size={10} className="text-gray-500" /> : <ChevronDown size={10} className="text-gray-500" />
-                              )}
-                            </td>
-                            <td className="px-2 py-2 text-right">{row.existing.toLocaleString()}</td>
-                            <td className="px-2 py-2 text-right text-amber-500">{row.tank > 0 ? row.tank.toLocaleString() : '-'}</td>
-                            <td className="px-2 py-2 text-right text-rose-500">{row.drone > 0 ? row.drone.toLocaleString() : '-'}</td>
-                            <td className="px-2 py-2 text-right text-cyan-500">{row.selfConsumption > 0 ? row.selfConsumption.toLocaleString() : '-'}</td>
-                            <td className="px-2 py-2 text-right font-bold text-white">
-                              {ratio > 0 ? `${ratio.toFixed(1)}%` : '-'}
-                            </td>
-                          </tr>
-                          {isExpanded && details.length > 0 && (
-                            <tr>
-                              <td colSpan={6} className="px-0 py-0">
-                                <div 
-                                  className="bg-[#1C1C24] p-3 border-b border-[#2A2A35] cursor-pointer"
-                                  onClick={() => {
-                                    setExpandedNaphthaRows(prev => prev.filter(c => c !== row.country));
-                                  }}
-                                >
-                                  <div className="grid grid-cols-1 gap-2">
-                                    {details.map((detail, dIdx) => (
-                                      <div key={dIdx} className="bg-[#2A2A35]/30 p-2 rounded-lg border border-[#2A2A35] text-[10px]">
-                                        <div className="flex justify-between mb-1">
-                                          <span className="text-gray-500">Origin:</span>
-                                          <span className="text-gray-300 font-medium">{detail.origin || '-'}</span>
-                                        </div>
-                                        <div className="flex justify-between mb-1">
-                                          <span className="text-gray-500">Port:</span>
-                                          <span className="text-gray-300 font-medium">{detail.port || '-'}</span>
-                                        </div>
-                                        <div className="flex justify-between mb-1">
-                                          <span className="text-gray-500">기존판매량:</span>
-                                          <span className="text-gray-300 font-medium">{detail.existing?.toLocaleString() || '-'}</span>
-                                        </div>
-                                        <div className="flex justify-between mb-1">
-                                          <span className="text-gray-500">Tank 제약:</span>
-                                          <span className="text-amber-500 font-medium">{detail.tank && detail.tank > 0 ? detail.tank.toLocaleString() : '-'}</span>
-                                        </div>
-                                        <div className="flex justify-between mb-1">
-                                          <span className="text-gray-500">Drone 피해:</span>
-                                          <span className="text-rose-500 font-medium">{detail.drone && detail.drone > 0 ? detail.drone.toLocaleString() : '-'}</span>
-                                        </div>
-                                        <div className="flex justify-between mb-1">
-                                          <span className="text-gray-500">자체 소비 물량 감소:</span>
-                                          <span className="text-cyan-500 font-medium">{detail.selfConsumption && detail.selfConsumption > 0 ? detail.selfConsumption.toLocaleString() : '-'}</span>
-                                        </div>
-                                        {detail.note && (
-                                          <div className="mt-1 pt-1 border-t border-[#2A2A35] text-rose-400 italic">
-                                            {detail.note}
-                                          </div>
-                                        )}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-                    <tr className="bg-[#1C1C24] font-bold border-t-2 border-[#2A2A35]">
-                      <td className="px-2 py-2 text-white">Total</td>
-                      <td className="px-2 py-2 text-right text-white">{naphthaDamageTotal.existing.toLocaleString()}</td>
-                      <td className="px-2 py-2 text-right text-amber-500">{naphthaDamageTotal.tank.toLocaleString()}</td>
-                      <td className="px-2 py-2 text-right text-rose-500">{naphthaDamageTotal.drone.toLocaleString()}</td>
-                      <td className="px-2 py-2 text-right text-cyan-500">{naphthaDamageTotal.selfConsumption.toLocaleString()}</td>
-                      <td className="px-2 py-2 text-right text-white">{naphthaDamageTotal.ratio.toFixed(1)}%</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div className="mt-2 text-right text-[10px] text-gray-500">
-                * 단위: 천톤/월
               </div>
             </CardContent>
           </Card>
@@ -1590,215 +1445,8 @@ export function Dashboard() {
         </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        {/* Force Majeure */}
-        <Card id="force-majeure" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24] lg:col-span-1">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <AlertTriangle className="text-rose-500" size={20} />
-                <div className="flex flex-col">
-                  <span className="leading-tight">Force Majeure 현황</span>
-                  {fmBaseDate && (
-                    <span className="text-[10px] text-gray-400 font-medium mt-0.5">
-                      {fmBaseDate.includes('기준') ? fmBaseDate : `[${fmBaseDate} 기준]`}
-                    </span>
-                  )}
-                </div>
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                <button 
-                  onMouseEnter={() => setShowFMHelp(true)}
-                  onMouseLeave={() => setShowFMHelp(false)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <HelpCircle size={18} />
-                </button>
-                {showFMHelp && (
-                  <div className="absolute right-0 top-6 w-48 p-3 bg-[#1C1C24] border border-[#2A2A35] rounded-xl shadow-2xl z-50 text-[11px]">
-                    <p className="text-gray-400 mb-2 font-bold">사업부별 표기</p>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                        <span className="text-gray-300">NCC/PO</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-blue-500" />
-                        <span className="text-gray-300">PVC/가소제</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                        <span className="text-gray-300">ABS</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-rose-500" />
-                        <span className="text-gray-300">아크릴/SAP</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-purple-500" />
-                        <span className="text-gray-300">HPM</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </CardHeader>
-          <CardContent className="pt-0">
-            <div className="flex justify-end mb-1">
-              <span className="text-[9px] text-gray-500">[단위: 만톤]</span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-[10px] sm:text-[11px] text-left text-gray-300">
-                <thead className="text-[9px] sm:text-[10px] text-gray-400 bg-[#1C1C24] border-b border-[#2A2A35]">
-                  <tr>
-                    <th className="px-2 py-2 font-medium">Commodity</th>
-                    <th className="px-2 py-2 font-medium">Region</th>
-                    <th className="px-2 py-2 font-medium text-right">F/M Capa</th>
-                    <th className="px-2 py-2 font-medium text-right">총 Capa</th>
-                    <th className="px-2 py-2 font-medium text-right">비중</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(showMoreFM ? fmAggregated : fmAggregated.slice(0, 5)).map((row: any, idx: number) => {
-                    const isExpanded = expandedFMRows.includes(`${row.commodity}-${row.region}`);
-                    const dotColor = 
-                      row.division === 'NCC/PO' ? 'bg-emerald-500' :
-                      row.division === 'PVC/가소제' ? 'bg-blue-500' :
-                      row.division === 'ABS' ? 'bg-yellow-500' :
-                      row.division === '아크릴/SAP' ? 'bg-rose-500' :
-                      row.division === 'HPM' ? 'bg-purple-500' : 'bg-gray-500';
-
-                    return (
-                      <React.Fragment key={idx}>
-                        <tr 
-                          className="border-b border-[#2A2A35]/50 hover:bg-[#2A2A35]/50 transition-colors cursor-pointer"
-                          onClick={() => {
-                            const key = `${row.commodity}-${row.region}`;
-                            setExpandedFMRows(prev => 
-                              prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
-                            );
-                          }}
-                        >
-                          <td className="px-2 py-2.5 font-medium text-white">
-                            <div className="flex items-center gap-1.5">
-                              <div className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
-                              {row.commodity}
-                            </div>
-                          </td>
-                          <td className="px-2 py-2.5 text-gray-400">{row.region}</td>
-                          <td className="px-2 py-2.5 text-right font-bold text-white">
-                            {row.capacity > 0 ? formatNumber(row.capacity, 0) : '-'}
-                          </td>
-                          <td className="px-2 py-2.5 text-right font-bold text-gray-400">
-                            {row.totalCapacity > 0 ? formatNumber(row.totalCapacity, 0) : '-'}
-                          </td>
-                          <td className="px-2 py-2.5 text-right font-bold text-rose-500">
-                            {row.totalCapacity > 0 ? `${formatNumber((row.capacity / row.totalCapacity) * 100, 1)}%` : '-'}
-                          </td>
-                        </tr>
-                        {isExpanded && (
-                          <tr>
-                            <td colSpan={5} className="px-0 py-0">
-                              <div 
-                                className="bg-[#1C1C24] p-3 border-b border-[#2A2A35] cursor-pointer"
-                                onClick={() => {
-                                  const key = `${row.commodity}-${row.region}`;
-                                  setExpandedFMRows(prev => prev.filter(k => k !== key));
-                                }}
-                              >
-                                {/* Desktop Table */}
-                                <div className="hidden sm:block overflow-x-auto">
-                                  <table className="w-full text-[10px] text-left text-gray-400">
-                                    <thead>
-                                      <tr className="border-b border-[#2A2A35]">
-                                        <th className="pb-2">Country</th>
-                                        <th className="pb-2">Company</th>
-                                        <th className="pb-2 text-right">Capa</th>
-                                        <th className="pb-2 text-center">Start</th>
-                                        <th className="pb-2 text-center">End</th>
-                                        <th className="pb-2">비고</th>
-                                        <th className="pb-2">출처</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {row.details.map((detail: any, dIdx: number) => (
-                                        <tr key={dIdx} className="border-b border-[#2A2A35]/30 last:border-0">
-                                          <td className="py-2 text-gray-300">{detail.country}</td>
-                                          <td className="py-2 text-gray-300">{detail.company}</td>
-                                          <td className="py-2 text-right text-rose-500 font-bold">{formatNumber(detail.capacity, 0)}</td>
-                                          <td className="py-2 text-center">{detail.start}</td>
-                                          <td className="py-2 text-center">{detail.end}</td>
-                                          <td className="py-2 text-[9px]">{detail.note}</td>
-                                          <td className="py-2 text-[9px]">{detail.source}</td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                                {/* Mobile Card Layout */}
-                                <div className="sm:hidden space-y-2">
-                                  {row.details.map((detail: any, dIdx: number) => (
-                                    <div key={dIdx} className="bg-[#2A2A35]/30 p-3 rounded-lg border border-[#2A2A35] text-[10px]">
-                                      <div className="flex justify-between mb-1">
-                                        <span className="text-gray-500">Company:</span>
-                                        <span className="text-white font-medium">{detail.company} ({detail.country})</span>
-                                      </div>
-                                      <div className="flex justify-between mb-1">
-                                        <span className="text-gray-500">Capacity:</span>
-                                        <span className="text-rose-500 font-bold">{formatNumber(detail.capacity, 0)} 만톤</span>
-                                      </div>
-                                      <div className="flex justify-between mb-1">
-                                        <span className="text-gray-500">Period:</span>
-                                        <span className="text-gray-300">{detail.start} ~ {detail.end}</span>
-                                      </div>
-                                      {detail.note && detail.note !== '-' && (
-                                        <div className="mt-2 pt-2 border-t border-[#2A2A35] text-gray-400">
-                                          <span className="text-gray-500 mr-1">Note:</span> {detail.note}
-                                        </div>
-                                      )}
-                                      {detail.source && detail.source !== '-' && (
-                                        <div className="mt-1 text-[9px] text-gray-500 italic">
-                                          Source: {detail.source}
-                                        </div>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            {fmAggregated.length > 5 && (
-              <button 
-                onClick={() => {
-                  if (showMoreFM) {
-                    scrollToSection('force-majeure');
-                  }
-                  setShowMoreFM(!showMoreFM);
-                }}
-                className="w-full mt-4 py-2 text-[11px] text-gray-400 hover:text-white hover:bg-[#2A2A35] transition-colors rounded-lg border border-[#2A2A35] flex items-center justify-center gap-1"
-              >
-                {showMoreFM ? (
-                  <>접기 <ChevronUp size={14} /></>
-                ) : (
-                  <>더보기 <ChevronDown size={14} /></>
-                )}
-              </button>
-            )}
-          </CardContent>
-        </Card>
-
         {/* Exchange Rate Dashboard */}
-        <Card id="exchange-rate" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24] mt-6 lg:col-span-3">
+        <Card id="exchange-rate" className="bg-gradient-to-br from-[#15151C] to-[#1A1A24] mt-6">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-6">
               <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center text-yellow-500">
@@ -1915,41 +1563,8 @@ export function Dashboard() {
             </div>
           </CardContent>
         </Card>
-        </div>
       </div>
     </div>
-      {/* Country Details Tooltip */}
-      {hoveredCountry.show && naphthaDamageDetailsMap[hoveredCountry.country] && (
-        <div 
-          className="fixed z-50 bg-[#1C1C24] border border-[#2A2A35] rounded-lg shadow-2xl p-3 pointer-events-none"
-          style={{ 
-            left: Math.min(hoveredCountry.x + 15, window.innerWidth - 300), 
-            top: hoveredCountry.y + 15,
-            minWidth: '250px',
-            maxWidth: '400px'
-          }}
-        >
-          <p className="text-white font-bold text-xs mb-2">{hoveredCountry.country} 상세 현황</p>
-          <table className="w-full text-[10px] text-left text-gray-300">
-            <thead className="bg-[#2A2A35] text-gray-400">
-              <tr>
-                <th className="px-2 py-1">Origin</th>
-                <th className="px-2 py-1">Port</th>
-                <th className="px-2 py-1">비고</th>
-              </tr>
-            </thead>
-            <tbody>
-              {naphthaDamageDetailsMap[hoveredCountry.country].map((detail, i) => (
-                <tr key={i} className="border-b border-[#2A2A35] last:border-0">
-                  <td className="px-2 py-1">{detail.origin || '-'}</td>
-                  <td className="px-2 py-1">{detail.port || '-'}</td>
-                  <td className="px-2 py-1 text-amber-400/90">{detail.note || '-'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+  </div>
   );
 }
