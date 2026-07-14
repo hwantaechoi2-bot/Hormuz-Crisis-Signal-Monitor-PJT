@@ -445,12 +445,17 @@ export function Dashboard() {
   const freightChartData = useMemo(() => {
     if (!filteredData || !filteredData.freight) return [];
     
-    const months = ['7월물', '8월물', '9월물', '10월물'];
-    return months.map(month => {
-      const row: any = { month };
+    const monthMapping = [
+      { key: '7월물', label: '7월' },
+      { key: '8월물', label: '8월' },
+      { key: '9월물', label: '9월' },
+      { key: '10월물', label: '10월' }
+    ];
+    return monthMapping.map(({ key, label }) => {
+      const row: any = { month: label };
       filteredData.freight.forEach((d: any) => {
-        if (d[month] !== undefined) {
-          row[d.date] = d[month];
+        if (d[key] !== undefined) {
+          row[d.date] = d[key];
         }
       });
       return row;
@@ -1368,10 +1373,10 @@ export function Dashboard() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-4">
               {[
-                { label: '7월물', latest: latestFreight['7월물'], prev: prevFreight['7월물'], date: latestFreight.date },
-                { label: '8월물', latest: latestFreight['8월물'], prev: prevFreight['8월물'], date: latestFreight.date },
-                { label: '9월물', latest: latestFreight['9월물'], prev: prevFreight['9월물'], date: latestFreight.date },
-                { label: '10월물', latest: latestFreight['10월물'], prev: prevFreight['10월물'], date: latestFreight.date },
+                { label: '7월물(당월)', latest: latestFreight['7월물'], prev: prevFreight['7월물'], date: latestFreight.date },
+                { label: '8월물(+1개월)', latest: latestFreight['8월물'], prev: prevFreight['8월물'], date: latestFreight.date },
+                { label: '9월물(+2개월)', latest: latestFreight['9월물'], prev: prevFreight['9월물'], date: latestFreight.date },
+                { label: '10월물(+3개월)', latest: latestFreight['10월물'], prev: prevFreight['10월물'], date: latestFreight.date },
               ].map((item) => {
                 const change = calculateChange(item.latest, item.prev);
                 return (
@@ -1413,7 +1418,7 @@ export function Dashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={freightChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2A2A35" vertical={false} />
-                  <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
+                  <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} interval={0} />
                   <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: '12px', paddingTop: '10px', cursor: 'pointer' }} />
