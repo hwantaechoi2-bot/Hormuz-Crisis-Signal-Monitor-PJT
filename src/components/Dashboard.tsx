@@ -752,7 +752,7 @@ export function Dashboard() {
                 <div className="mb-4 p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">1. WTI</p>
-                    <p className="text-[9px] text-gray-400 leading-relaxed">CL, 뉴욕상업거래소, 서부텍사스산 원유 (26.10.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 WTI(Western Texas Intermediate) 선물의 최근월물 가격</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">CL, 뉴욕상업거래소, 서부텍사스산 원유 (26.11.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 WTI(Western Texas Intermediate) 선물의 최근월물 가격</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">2. BRENT</p>
@@ -760,7 +760,7 @@ export function Dashboard() {
                   </div>
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">3. DUBAI</p>
-                    <p className="text-[9px] text-gray-400 leading-relaxed">DCB, 뉴욕상업거래소, 두바이유 (26.09.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 두바이 크루드 오일 선물의 최근월물 가격(두바이유는 현물거래임에 따라 실시간 가격 확인 제한)</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">DCB, 뉴욕상업거래소, 두바이유 (26.10.)<br/>뉴욕상업거래소(NYMEX)에서 거래되는 두바이 크루드 오일 선물의 최근월물 가격(두바이유는 현물거래임에 따라 실시간 가격 확인 제한)</p>
                   </div>
                 </div>
               )}
@@ -769,7 +769,7 @@ export function Dashboard() {
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
                   <div className="flex flex-col items-center mb-1">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">WTI</p>
-                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.10)</p>
+                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.11)</p>
                   </div>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.WTI, 2)}</span>
                   <div className={`flex flex-col items-center mt-1 ${realtimeWtiChange.color}`}>
@@ -799,7 +799,7 @@ export function Dashboard() {
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
                   <div className="flex flex-col items-center mb-1">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Dubai</p>
-                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.09)</p>
+                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.10)</p>
                   </div>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Dubai, 2)}</span>
                   <div className={`flex flex-col items-center mt-1 ${realtimeDubaiChange.color}`}>
