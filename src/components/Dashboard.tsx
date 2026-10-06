@@ -335,10 +335,10 @@ export function Dashboard() {
       const freightGrouped: any = {};
       res.freightData.forEach(row => {
         if (!freightGrouped[row.date]) freightGrouped[row.date] = { date: row.date };
-        if (row.name.includes('9월물')) freightGrouped[row.date]['9월물'] = row.price;
         if (row.name.includes('10월물')) freightGrouped[row.date]['10월물'] = row.price;
         if (row.name.includes('11월물')) freightGrouped[row.date]['11월물'] = row.price;
         if (row.name.includes('12월물')) freightGrouped[row.date]['12월물'] = row.price;
+        if (row.name.includes('27.1월물')) freightGrouped[row.date]['27.1월물'] = row.price;
       });
       const processedFreight = Object.values(freightGrouped).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -446,10 +446,10 @@ export function Dashboard() {
     if (!filteredData || !filteredData.freight) return [];
     
     const monthMapping = [
-      { key: '9월물', label: '9월' },
       { key: '10월물', label: '10월' },
       { key: '11월물', label: '11월' },
-      { key: '12월물', label: '12월' }
+      { key: '12월물', label: '12월' },
+      { key: '27.1월물', label: '27.1월' }
     ];
     return monthMapping.map(({ key, label }) => {
       const row: any = { month: label };
@@ -548,8 +548,8 @@ export function Dashboard() {
   const prevButadieneSpread = revPB.find(d => d.ButadieneSpread !== undefined && d.date !== latestButadieneSpread.date) || {};
 
   const revFreight = [...(data?.freight || [])].reverse();
-  const latestFreight = revFreight.find(d => d['9월물'] !== undefined || d['10월물'] !== undefined) || {};
-  const prevFreight = revFreight.find(d => (d['9월물'] !== undefined || d['10월물'] !== undefined) && d.date !== latestFreight.date) || {};
+  const latestFreight = revFreight.find(d => d['10월물'] !== undefined || d['11월물'] !== undefined) || {};
+  const prevFreight = revFreight.find(d => (d['10월물'] !== undefined || d['11월물'] !== undefined) && d.date !== latestFreight.date) || {};
 
   const revFreightSpot = [...(data?.freightSpot || [])].reverse();
   const latestBDI = revFreightSpot.find(d => d.BDI !== undefined) || {};
@@ -756,7 +756,7 @@ export function Dashboard() {
                   </div>
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">2. BRENT</p>
-                    <p className="text-[9px] text-gray-400 leading-relaxed">BRN, 유럽 ICE선물거래소, 브렌트유 (26.11.)<br/>ICE 선물거래소에서 거래되는 영국 브렌트유 선물의 최근월물 가격</p>
+                    <p className="text-[9px] text-gray-400 leading-relaxed">BRN, 유럽 ICE선물거래소, 브렌트유 (26.12.)<br/>ICE 선물거래소에서 거래되는 영국 브렌트유 선물의 최근월물 가격</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-blue-400 font-bold mb-0.5">3. DUBAI</p>
@@ -784,7 +784,7 @@ export function Dashboard() {
                 <div className="bg-[#1C1C24]/50 p-3 rounded-xl border border-[#2A2A35] flex flex-col items-center text-center">
                   <div className="flex flex-col items-center mb-1">
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">Brent</p>
-                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.11)</p>
+                    <p className="text-[9px] text-gray-600 font-medium mt-0.5">(26.12)</p>
                   </div>
                   <span className="text-xl font-black text-white tracking-tighter">${formatNumber(realtimePrice.Brent, 2)}</span>
                   <div className={`flex flex-col items-center mt-1 ${realtimeBrentChange.color}`}>
@@ -1373,10 +1373,10 @@ export function Dashboard() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-4">
               {[
-                { label: '9월물(당월)', latest: latestFreight['9월물'], prev: prevFreight['9월물'], date: latestFreight.date },
-                { label: '10월물(+1개월)', latest: latestFreight['10월물'], prev: prevFreight['10월물'], date: latestFreight.date },
-                { label: '11월물(+2개월)', latest: latestFreight['11월물'], prev: prevFreight['11월물'], date: latestFreight.date },
-                { label: '12월물(+3개월)', latest: latestFreight['12월물'], prev: prevFreight['12월물'], date: latestFreight.date },
+                { label: '10월물(당월)', latest: latestFreight['10월물'], prev: prevFreight['10월물'], date: latestFreight.date },
+                { label: '11월물(+1개월)', latest: latestFreight['11월물'], prev: prevFreight['11월물'], date: latestFreight.date },
+                { label: '12월물(+2개월)', latest: latestFreight['12월물'], prev: prevFreight['12월물'], date: latestFreight.date },
+                { label: '27.1월물(+3개월)', latest: latestFreight['27.1월물'], prev: prevFreight['27.1월물'], date: latestFreight.date },
               ].map((item) => {
                 const change = calculateChange(item.latest, item.prev);
                 return (
